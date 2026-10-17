@@ -251,12 +251,13 @@ and run all cells:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iammatthi/NLP/blob/main/notebooks/experiment4_native.ipynb)
 
-The notebook clones this repo (code and datasets both live in it), pins
-`transformers==4.57.6` — the version Colab ships on the 2026.01 runtime — then
-runs the same `train.py` / `evaluate.py` commands as above, for 3 seeds each of
-4a and 4b. A final cell zips and downloads `eval_test.json` per run.
+The notebook clones this repo (code and datasets both live in it), then runs the
+same `train.py` / `evaluate.py` commands as above, for 3 seeds each of 4a and 4b.
+A final cell zips and downloads `eval_test.json` per run.
 
-Requires a GPU runtime (Runtime → Change runtime type → T4).
+Requires a GPU runtime (Runtime → Change runtime type → T4). `transformers==5.18.0`
+is already the version Colab's current runtime ships, so the install cell is a
+no-op and nothing preinstalled is disturbed.
 
 ## Implementation status
 
