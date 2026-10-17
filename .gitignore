@@ -1,0 +1,16 @@
+# virtualenv
+.venv/
+venv/
+
+# python bytecode
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# generated experiment artefacts
+data/splits/
+outputs/
+
+# notebook / editor
+.ipynb_checkpoints/
+.DS_Store
