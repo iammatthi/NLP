@@ -23,6 +23,13 @@ from __future__ import annotations
 import argparse
 import sys
 import traceback
+from pathlib import Path
+
+# Allow running without installing the project (e.g. `python scripts/x.py` on
+# Colab), where the repo root is not otherwise on sys.path.
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
