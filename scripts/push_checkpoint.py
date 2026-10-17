@@ -4,17 +4,19 @@ This is how checkpoints survive a Colab runtime restart. Only the best
 checkpoint (`final/`, selected on validation macro-F1) and the small metrics
 files are pushed; intermediate `checkpoint-*` folders are deliberately skipped.
 
+The target repo is **not** defaulted here - each experiment names its own.
+
 Example (full run: model + metrics):
 
-    python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42
+    python scripts/push_checkpoint.py --repo-id <user>/<repo> --run-dir outputs/4a_xlmr_seed42
 
 Example (after evaluate.py, to add just the tiny metrics files):
 
-    python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42 --metrics-only
+    python scripts/push_checkpoint.py --repo-id <user>/<repo> --run-dir outputs/4a_xlmr_seed42 --metrics-only
 
 Example (see what would be uploaded, no network):
 
-    python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42 --dry-run
+    python scripts/push_checkpoint.py --repo-id <user>/<repo> --run-dir outputs/4a_xlmr_seed42 --dry-run
 
 The repo is created **private** on first use. Keep it private: the source
 datasets state no licence, so model weights trained on them should not be
@@ -24,7 +26,6 @@ published until that is settled.
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
@@ -39,12 +40,12 @@ NESTED_METRIC_FILES = ("final/eval_test.json",)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--run-dir", type=Path, required=True, help="e.g. outputs/4a_xlmr_seed42")
     parser.add_argument(
         "--repo-id",
-        default=os.environ.get("HF_REPO"),
-        help="target repo, e.g. 'iammatthi/nlp-exp4' (or set HF_REPO)",
+        required=True,
+        help="target repo, e.g. 'your-user/your-repo' (created private on first use)",
     )
+    parser.add_argument("--run-dir", type=Path, required=True, help="e.g. outputs/4a_xlmr_seed42")
     parser.add_argument("--metrics-only", action="store_true", help="push only the small metrics files")
     parser.add_argument("--public", action="store_true", help="make the repo public (default: private)")
     parser.add_argument("--dry-run", action="store_true", help="list actions without contacting the Hub")
@@ -107,14 +108,14 @@ def main() -> None:
         raise FileNotFoundError(f"{run_dir} not found")
 
     if not args.dry_run and not args.repo_id:
-        raise SystemExit("no --repo-id given and HF_REPO is not set")
+        raise SystemExit("--repo-id is required")
 
     items = collect(run_dir, args.metrics_only)
     if not items:
         raise SystemExit(f"nothing to upload from {run_dir}")
 
     print(f"run : {run_dir}")
-    print(f"repo: {args.repo_id or '(unset)'}")
+    print(f"repo: {args.repo_id}")
     describe(items, args.metrics_only)
 
     if args.dry_run:

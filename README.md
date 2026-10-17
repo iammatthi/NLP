@@ -229,17 +229,20 @@ Only `final/` and the small metrics files are uploaded — intermediate
 `checkpoint-*` folders are skipped.
 
 ```bash
-export HF_REPO=iammatthi/nlp-exp4-native-bn   # created private on first use
+REPO=iammatthi/nlp-exp4-native-bn   # created private on first use
 
 # after each training run (model + metrics)
-uv run python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42
+uv run python scripts/push_checkpoint.py --repo-id "$REPO" --run-dir outputs/4a_xlmr_seed42
 
 # after evaluate.py (just the tiny metrics files)
-uv run python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42 --metrics-only
+uv run python scripts/push_checkpoint.py --repo-id "$REPO" --run-dir outputs/4a_xlmr_seed42 --metrics-only
 
 # see what would be uploaded, no network
-uv run python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42 --dry-run
+uv run python scripts/push_checkpoint.py --repo-id "$REPO" --run-dir outputs/4a_xlmr_seed42 --dry-run
 ```
+
+`--repo-id` is required — `push_checkpoint.py` carries no default, so each
+experiment names its own repo. Experiment 4 uses `iammatthi/nlp-exp4-native-bn`.
 
 Needs `HF_TOKEN` with `write` scope in the environment (or already logged in via
 `hf auth login`). Six runs ≈ 4.7 GB, which fits the free 100 GB private quota.
