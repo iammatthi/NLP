@@ -127,6 +127,7 @@ src/metrics.py         ordinal metrics + Trainer compute_metrics hook
 scripts/
   prepare_splits.py    emit data/splits/{bn,en}_{train,val,test}.csv
   smoke_test_model.py  CPU-only build check (no training)
+  push_checkpoint.py   upload one run's best checkpoint to a private HF Hub repo
 train.py               fine-tune a backbone on the native splits (experiment 4)
 evaluate.py            ordinal metrics + bootstrap CIs on a held-out split
 notebooks/
@@ -220,7 +221,33 @@ Each writes `eval_test.json` into the model directory containing macro-F1,
 per-class F1, MAE, QWK, accuracy, the confusion matrix, the
 upgrade/ok/downgrade error-direction matrix, and bootstrap 95% CIs.
 
-### 5. Summarise across seeds
+### 5. Persist checkpoints to the Hugging Face Hub
+
+`outputs/` is gitignored and a Colab VM is wiped when the runtime recycles, so
+push each run's best checkpoint to a **private** Hub repo as soon as it is done.
+Only `final/` and the small metrics files are uploaded — intermediate
+`checkpoint-*` folders are skipped.
+
+```bash
+export HF_REPO=iammatthi/nlp-exp4-native-bn   # created private on first use
+
+# after each training run (model + metrics)
+uv run python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42
+
+# after evaluate.py (just the tiny metrics files)
+uv run python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42 --metrics-only
+
+# see what would be uploaded, no network
+uv run python scripts/push_checkpoint.py --run-dir outputs/4a_xlmr_seed42 --dry-run
+```
+
+Needs `HF_TOKEN` with `write` scope in the environment (or already logged in via
+`hf auth login`). Six runs ≈ 4.7 GB, which fits the free 100 GB private quota.
+
+**Keep the repo private.** The source datasets state no licence, so model weights
+trained on them should not be published until that is settled.
+
+### 6. Summarise across seeds
 
 ```bash
 uv run python - <<'PY'
@@ -251,13 +278,17 @@ and run all cells:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iammatthi/NLP/blob/main/notebooks/experiment4_native.ipynb)
 
-The notebook clones this repo (code and datasets both live in it), then runs the
-same `train.py` / `evaluate.py` commands as above, for 3 seeds each of 4a and 4b.
-A final cell zips and downloads `eval_test.json` per run.
+The notebook clones this repo (code and datasets both live in it), authenticates
+to the Hugging Face Hub, then runs the same `train.py` / `evaluate.py` commands as
+above, for 3 seeds each of 4a and 4b. Every run's best checkpoint is pushed to a
+**private** Hub repo immediately, so a runtime restart costs at most one run.
 
 Requires a GPU runtime (Runtime → Change runtime type → T4). `transformers==5.18.0`
 is already the version Colab's current runtime ships, so the install cell is a
 no-op and nothing preinstalled is disturbed.
+
+Set `HF_TOKEN` in Colab Secrets (key icon in the left sidebar) before running.
+The token needs `write` scope and is read from Secrets, never printed.
 
 ## Implementation status
 
@@ -269,6 +300,7 @@ no-op and nothing preinstalled is disturbed.
 | Ordinal metrics + bootstrap CIs | done (`evaluate.py`) |
 | Experiment 4a / 4b end-to-end | verified on CPU with `--max-steps 4` |
 | Colab notebook for experiment 4 | done (`notebooks/experiment4_native.ipynb`) |
+| Checkpoint persistence (private HF Hub repo) | done (`scripts/push_checkpoint.py`) |
 | Translation (configs 2–3) | not started |
 | Logit-adjustment ablation | not started |
 | SHAP (RQ2) | not started |
