@@ -1,20 +1,11 @@
-"""Evaluate a trained experiment-4 checkpoint on the native test split.
+"""Evaluate a trained experiment-4 checkpoint on a held-out split.
 
 Writes the full ordinal metric suite: macro-F1, per-class F1, MAE, QWK, and
 the upgrade/ok/downgrade error-direction matrix (downgrade = pred < gold),
 plus bootstrap 95% CIs for macro-F1, QWK and the downgrade rate.
 
-Example (experiment 4a test split):
-
-    uv run python evaluate.py --model-dir outputs/4a_xlmr/final --lang bn --split test --seed 42
-
-Example (experiment 4b test split):
-
-    uv run python evaluate.py --model-dir outputs/4b_banglabert/final --lang bn --split test --seed 42
-
-Score the validation split instead:
-
-    uv run python evaluate.py --model-dir outputs/4a_xlmr/final --lang bn --split val
+`eval_test.json` is written *inside* `--model-dir`, so it travels with the
+checkpoint it describes.
 """
 
 from __future__ import annotations

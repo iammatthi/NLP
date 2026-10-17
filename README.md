@@ -141,157 +141,34 @@ outputs/               run artefacts: checkpoints, metrics, predictions (gitigno
 Labels are stored in domain space (1..4) everywhere except inside the model
 boundary, where `to_model_label` / `to_domain_label` shift to 0..3 and back.
 
-## Replicating experiment 4
+## Running it
 
-Experiment 4 is the **Native Gold Standard**: train and evaluate directly on
-native Bengali splits. 4a uses the shared XLM-R backbone (the controlled
-condition comparable to configs 1–3), 4b uses BanglaBERT (the native-specialized
-oracle). Both read the *same* splits, so the only difference is the backbone.
-
-### 0. Setup
-
-```bash
-uv sync
-```
-
-### 1. Verify the models build locally (CPU, no training)
-
-Catches checkpoint-loading problems before spending Colab time. Exits non-zero
-on failure.
-
-```bash
-uv run python scripts/smoke_test_model.py
-```
-
-### 2. Prepare the stratified splits
-
-Written once, reused by every run, so results are comparable across seeds.
-
-```bash
-uv run python scripts/prepare_splits.py --lang bn --seed 42
-uv run python scripts/prepare_splits.py --lang en --seed 42   # configs 1-3 later
-```
-
-### 3. Train
-
-3 seeds per condition (README reports mean ± std). Checkpoints are selected on
-validation macro-F1; the best checkpoint is written to `<output-dir>/final/`.
-
-```bash
-# 4a - XLM-R on native Bengali (controlled condition)
-uv run python train.py --model xlmr --lang bn --output-dir outputs/4a_xlmr_seed42 \
-    --seed 42 --epochs 4 --train-batch-size 16 --learning-rate 2e-5
-uv run python train.py --model xlmr --lang bn --output-dir outputs/4a_xlmr_seed43 \
-    --seed 43 --epochs 4 --train-batch-size 16 --learning-rate 2e-5
-uv run python train.py --model xlmr --lang bn --output-dir outputs/4a_xlmr_seed44 \
-    --seed 44 --epochs 4 --train-batch-size 16 --learning-rate 2e-5
-
-# 4b - BanglaBERT on native Bengali (native-specialized oracle)
-uv run python train.py --model banglabert --lang bn --output-dir outputs/4b_banglabert_seed42 \
-    --seed 42 --epochs 4 --train-batch-size 16 --learning-rate 2e-5
-uv run python train.py --model banglabert --lang bn --output-dir outputs/4b_banglabert_seed43 \
-    --seed 43 --epochs 4 --train-batch-size 16 --learning-rate 2e-5
-uv run python train.py --model banglabert --lang bn --output-dir outputs/4b_banglabert_seed44 \
-    --seed 44 --epochs 4 --train-batch-size 16 --learning-rate 2e-5
-```
-
-Notes:
-- `--model` accepts the alias `xlmr` or `banglabert`, or any HF model id.
-- Class-weighted cross-entropy is on by default (inverse-frequency, computed from
-  the train split). Disable with `--no-class-weights` for an ablation.
-- On a Colab GPU add `--bf16`; the script auto-disables fp16/bf16 on CPU.
-- On the local CPU, verify the loop first with `--max-steps 4 --epochs 1
-  --train-batch-size 4 --eval-batch-size 8` before launching a full run.
-
-### 4. Evaluate on the held-out test split
-
-```bash
-# 4a
-uv run python evaluate.py --model-dir outputs/4a_xlmr_seed42/final    --lang bn --split test --seed 42
-uv run python evaluate.py --model-dir outputs/4a_xlmr_seed43/final    --lang bn --split test --seed 42
-uv run python evaluate.py --model-dir outputs/4a_xlmr_seed44/final    --lang bn --split test --seed 42
-
-# 4b
-uv run python evaluate.py --model-dir outputs/4b_banglabert_seed42/final --lang bn --split test --seed 42
-uv run python evaluate.py --model-dir outputs/4b_banglabert_seed43/final --lang bn --split test --seed 42
-uv run python evaluate.py --model-dir outputs/4b_banglabert_seed44/final --lang bn --split test --seed 42
-```
-
-Each writes `eval_test.json` into the model directory containing macro-F1,
-per-class F1, MAE, QWK, accuracy, the confusion matrix, the
-upgrade/ok/downgrade error-direction matrix, and bootstrap 95% CIs.
-
-### 5. Persist checkpoints to the Hugging Face Hub
-
-`outputs/` is gitignored and a Colab VM is wiped when the runtime recycles, so
-push each run's best checkpoint to a **private** Hub repo as soon as it is done.
-Only `final/` and the small metrics files are uploaded — intermediate
-`checkpoint-*` folders are skipped.
-
-```bash
-REPO=iammatthi/nlp-exp4-native-bn   # created private on first use
-
-# after each training run (model + metrics)
-uv run python scripts/push_checkpoint.py --repo-id "$REPO" --run-dir outputs/4a_xlmr_seed42
-
-# after evaluate.py (just the tiny metrics files)
-uv run python scripts/push_checkpoint.py --repo-id "$REPO" --run-dir outputs/4a_xlmr_seed42 --metrics-only
-
-# see what would be uploaded, no network
-uv run python scripts/push_checkpoint.py --repo-id "$REPO" --run-dir outputs/4a_xlmr_seed42 --dry-run
-```
-
-`--repo-id` is required — `push_checkpoint.py` carries no default, so each
-experiment names its own repo. Experiment 4 uses `iammatthi/nlp-exp4-native-bn`.
-
-Needs `HF_TOKEN` with `write` scope in the environment (or already logged in via
-`hf auth login`). Six runs ≈ 4.7 GB, which fits the free 100 GB private quota.
-
-**Keep the repo private.** The source datasets state no licence, so model weights
-trained on them should not be published until that is settled.
-
-### 6. Summarise across seeds
-
-```bash
-uv run python - <<'PY'
-import json, glob, statistics as st
-
-def mean_std(vals):
-    m = st.mean(vals)
-    s = st.stdev(vals) if len(vals) > 1 else 0.0
-    return f"{m:.4f} ± {s:.4f}"
-
-for tag in ("4a_xlmr", "4b_banglabert"):
-    runs = [json.load(open(p)) for p in sorted(glob.glob(f"outputs/{tag}_seed*/final/eval_test.json"))]
-    if not runs:
-        print(f"{tag}: no results"); continue
-    for key in ("macro_f1", "qwk", "mae"):
-        print(f"{tag:16s} {key:9s} {mean_std([r[key] for r in runs])}")
-    print(f"{tag:16s} downgrade {mean_std([r['direction']['downgrade_rate'] for r in runs])}")
-PY
-```
-
-Note `evaluate.py` writes `eval_test.json` into the `--model-dir`, which is the
-`final/` subdirectory — hence the `*/final/` in the glob.
-
-### Running on Colab
-
-Open [`notebooks/experiment4_native.ipynb`](notebooks/experiment4_native.ipynb) in Colab
-and run all cells:
+[`notebooks/experiment4_native.ipynb`](notebooks/experiment4_native.ipynb) drives
+experiment 4: it sets up Colab, trains 4a and 4b across 3 seeds each, scores the
+held-out test split, and pushes every best checkpoint to a private Hub repo as it
+finishes. Run the notebook end to end.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iammatthi/NLP/blob/main/notebooks/experiment4_native.ipynb)
 
-The notebook clones this repo (code and datasets both live in it), authenticates
-to the Hugging Face Hub, then runs the same `train.py` / `evaluate.py` commands as
-above, for 3 seeds each of 4a and 4b. Every run's best checkpoint is pushed to a
-**private** Hub repo immediately, so a runtime restart costs at most one run.
+Entry points — see each `--help` for flags, and the notebook for the invocation
+that ties them together:
 
-Requires a GPU runtime (Runtime → Change runtime type → T4). `transformers==5.18.0`
-is already the version Colab's current runtime ships, so the install cell is a
-no-op and nothing preinstalled is disturbed.
+- `scripts/prepare_splits.py` — stratified 80/10/10 splits, fixed seed
+- `scripts/smoke_test_model.py` — CPU build check for both backbones
+- `train.py` — fine-tune one backbone on the native splits
+- `evaluate.py` — ordinal metrics + bootstrap CIs on a held-out split
+- `scripts/push_checkpoint.py` — upload one run's best checkpoint to the Hub
 
-Set `HF_TOKEN` in Colab Secrets (key icon in the left sidebar) before running.
-The token needs `write` scope and is read from Secrets, never printed.
+Conventions the notebook assumes:
+
+- **3 seeds per condition**, reported as `mean ± std`.
+- Checkpoints are selected on **validation macro-F1**; `evaluate.py` then scores
+  the separate held-out **test** split.
+- Class-weighted cross-entropy (inverse-frequency from the train split) is on by
+  default — without it the model collapses onto `minimal`.
+- Checkpoints are pushed to a **private** Hub repo (`--repo-id` is required, the
+  tool has no default). Keep it private: the source datasets state no licence, so
+  trained weights should not be published until that is settled.
 
 ## Implementation status
 
@@ -322,9 +199,10 @@ Dropped to keep the timeline short; revisit only if time permits.
 
 ## Getting started
 
+Local development only — the Colab notebook uses `pip` instead.
+
 ```bash
 uv sync
-uv run python scripts/smoke_test_model.py
 ```
 
-Then follow **Replicating experiment 4** above.
+Then see **Running it**.

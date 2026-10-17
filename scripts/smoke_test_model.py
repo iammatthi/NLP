@@ -4,18 +4,6 @@ Loads each tokenizer + `AutoModelForSequenceClassification`, runs a real
 forward pass on two Bengali rows from the dataset, and asserts the logits
 shape. No training, no GPU. Exits non-zero on failure so it can gate CI
 and be run before spending Colab time.
-
-Example (both experiment-4 backbones, the default):
-
-    uv run python scripts/smoke_test_model.py
-
-Example (a single model, more probe rows):
-
-    uv run python scripts/smoke_test_model.py --models csebuetnlp/banglabert --rows 4
-
-Example (a different backbone):
-
-    uv run python scripts/smoke_test_model.py --models sagorsarker/bangla-bert-base
 """
 
 from __future__ import annotations

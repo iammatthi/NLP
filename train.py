@@ -1,28 +1,11 @@
 """Fine-tune a backbone on the native-language severity splits (experiment 4).
 
-Condition 4a (controlled)     : --model FacebookAI/xlm-roberta-base --lang bn
-Condition 4b (specialized)    : --model csebuetnlp/banglabert     --lang bn
+Condition 4a (controlled)  : `--model xlmr`
+Condition 4b (specialized) : `--model banglabert`
 
 Both conditions train and evaluate on the *same* native splits; only the
 backbone differs. Class-weighted cross-entropy counteracts the label prior
 without resampling. Checkpoints are selected on validation macro-F1.
-
-Example (experiment 4a, run after `uv run python scripts/prepare_splits.py --lang bn`):
-
-    uv run python train.py --model xlmr --lang bn --output-dir outputs/4a_xlmr \
-        --seed 42 --epochs 4 --train-batch-size 16 --learning-rate 2e-5
-
-Example (experiment 4b):
-
-    uv run python train.py --model banglabert --lang bn --output-dir outputs/4b_banglabert \
-        --seed 42 --epochs 4 --train-batch-size 16 --learning-rate 2e-5
-
-Smoke-run the training loop on CPU (a few steps, no useful model):
-
-    uv run python train.py --model banglabert --lang bn --output-dir outputs/smoke \
-        --max-steps 4 --epochs 1 --train-batch-size 4 --eval-batch-size 8
-
-Repeat with --seed 43 and --seed 44 for the 3-seed runs.
 """
 
 from __future__ import annotations

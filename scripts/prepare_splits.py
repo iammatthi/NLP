@@ -1,19 +1,8 @@
 """Build and persist the stratified train/val/test splits.
 
 Writes `data/splits/{lang}_{train,val,test}.csv` so every downstream run
-trains and evaluates on identical data.
-
-Example (experiment 4 - Bengali splits, the ones 4a and 4b use):
-
-    uv run python scripts/prepare_splits.py --lang bn --seed 42
-
-Example (English splits, needed later for configs 1-3):
-
-    uv run python scripts/prepare_splits.py --lang en --seed 42
-
-Example (non-default split ratios):
-
-    uv run python scripts/prepare_splits.py --lang bn --seed 42 --train-size 0.7 --val-size 0.15
+trains and evaluates on identical data. The seed makes the split
+byte-reproducible.
 """
 
 from __future__ import annotations

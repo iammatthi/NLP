@@ -4,22 +4,9 @@ This is how checkpoints survive a Colab runtime restart. Only the best
 checkpoint (`final/`, selected on validation macro-F1) and the small metrics
 files are pushed; intermediate `checkpoint-*` folders are deliberately skipped.
 
-The target repo is **not** defaulted here - each experiment names its own.
-
-Example (full run: model + metrics):
-
-    python scripts/push_checkpoint.py --repo-id <user>/<repo> --run-dir outputs/4a_xlmr_seed42
-
-Example (after evaluate.py, to add just the tiny metrics files):
-
-    python scripts/push_checkpoint.py --repo-id <user>/<repo> --run-dir outputs/4a_xlmr_seed42 --metrics-only
-
-Example (see what would be uploaded, no network):
-
-    python scripts/push_checkpoint.py --repo-id <user>/<repo> --run-dir outputs/4a_xlmr_seed42 --dry-run
-
-The repo is created **private** on first use. Keep it private: the source
-datasets state no licence, so model weights trained on them should not be
+The target repo is **not** defaulted here — each experiment names its own via
+`--repo-id`. The repo is created **private** on first use; keep it private, as
+the source datasets state no licence and trained weights should not be
 published until that is settled.
 """
 
