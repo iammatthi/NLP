@@ -27,6 +27,9 @@ Each `{run}_seed{N}/` directory holds the two artefacts written by
 - `train_metrics.json` — training summary: final train loss, runtime, label
   counts and the inverse-frequency class weights.
 
+Model checkpoints are not part of this repository. The source datasets state no
+licence, so trained weights are not redistributed here.
+
 Driver: [`notebooks/experiment4_native.ipynb`](../../notebooks/experiment4_native.ipynb).
 
 ## Results
@@ -268,3 +271,5 @@ in both directions rather than differently biased.
 - `accuracy` is reported for completeness but is misleading on this prior —
   `minimal` alone is 43% of the train split. Macro-F1 and QWK are the primary
   measures.
+- The source datasets state no licence. Trained weights should not be
+  redistributed until that is settled.
