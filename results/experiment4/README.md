@@ -184,7 +184,7 @@ to severe. `minimal` and `severe` each have a single neighbour and corresponding
 fewer routes to error.
 
 Sample count does not account for the gap. `moderate` has 71 test cases and
-`severe` only 55, yet `severe` scores roughly 0.20 F1 higher; the loss also
+`severe` only 55, yet `severe` scores about 0.19 F1 higher; the loss also
 upweights `moderate` (1.30) almost as strongly as `severe` (1.66). Plausible
 contributing factors that the present runs cannot distinguish:
 
@@ -218,7 +218,7 @@ floor of the scale and the largest class (210 test cases), so all of its errors
 are upgrades by construction; `severe` is the ceiling and the smallest class
 (55), so all of its errors are downgrades. In the mean confusion matrices,
 `minimal` alone accounts for about 51% of all upgrades in 4a and about 68% in
-4b, while `severe` supplies only about a quarter of all downgrades. Comparing
+4b, while `severe` supplies 24% of downgrades in 4a and 21% in 4b. Comparing
 the two rates therefore overstates any systematic bias.
 
 Looking only at the interior classes, where errors can go in either direction,
