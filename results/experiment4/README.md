@@ -15,7 +15,7 @@ Setup: 3 seeds (42/43/44), class-weighted cross-entropy, max length 256, lr
 checkpoint selected on **validation macro-F1**, then scored once on the held-out
 **test** split (n=490). All numbers below are mean +/- std across the 3 seeds.
 
-## Files
+## Artefacts
 
 Each `{run}_seed{N}/` directory holds the two artefacts written by
 `train.py` and `evaluate.py`:
@@ -27,15 +27,12 @@ Each `{run}_seed{N}/` directory holds the two artefacts written by
 - `train_metrics.json` — training summary: final train loss, runtime, label
   counts and the inverse-frequency class weights.
 
-Checkpoints (`model.safetensors`, tokenizer, config) are **not** stored here.
-They are pushed to the private Hub repo
-[`iammatthi/nlp-exp4-native-bn`](https://huggingface.co/iammatthi/nlp-exp4-native-bn)
-by `scripts/push_checkpoint.py`. Local `final/` exports of the same checkpoints
-for each seed are kept outside the repo.
+Model checkpoints are not part of this repository. The source datasets state no
+licence, so trained weights are not redistributed here.
 
 Driver: [`notebooks/experiment4_native.ipynb`](../../notebooks/experiment4_native.ipynb).
 
-## Test results
+## Results
 
 | metric | 4a XLM-R | 4b BanglaBERT |
 |---|---|---|
@@ -94,58 +91,81 @@ scored above.
 
 ## Interpretation
 
-### BanglaBERT wins, and is far more stable
+### Backbone comparison
 
-4b is ahead on every aggregate: macro-F1 0.8130 vs 0.7682
-(+0.0448), QWK 0.8287 vs 0.7798 (+0.0489), and MAE
-0.2204 vs 0.2707 (-0.0503). Both are far above chance — on this
-split a majority-class baseline scores macro-F1 0.15 and a uniform-random
-baseline about 0.22.
+4b leads on every aggregate measure: macro-F1 0.8130 against 0.7682
+(+0.0448), QWK 0.8287 against 0.7798 (+0.0489), and MAE 0.2204 against
+0.2707 (-0.0503). Both conditions sit far above chance levels: a
+majority-class baseline reaches macro-F1 0.15 and a uniform-random baseline
+about 0.22 on this split.
 
-The gap is not just accuracy. Test macro-F1 varies by +/- 0.0013 across seeds for
-4b against +/- 0.0313 for 4a, a roughly 23x difference.
+The advantage is not uniform across classes. 4b is ahead on mild (+0.018 F1),
+moderate (+0.092) and severe (+0.075), and marginally behind on minimal
+(-0.005). The mild difference falls inside the +/- 0.017 seed spread of either
+model, so only the moderate and severe gaps are clearly outside run-to-run
+noise.
 
-### Low seed variance does not mean "needs more training"
+Several mechanisms could produce this ordering, and the current runs do not
+separate them:
 
-The smaller standard deviation is a **stability** signal, not a sign of
-under-training. Standard deviation across seeds measures how sensitive the final
-solution is to the initialisation: high variance means different seeds settle in
-different basins, which is what under-converged optimisation tends to look like.
-Low variance means all three seeds reached essentially the same place. That is
-evidence of *more* convergence, not less.
+- **Pretraining alignment.** 4b was pretrained on Bengali alone, so fine-tuning
+  is a small adjustment to an already task-aligned representation. 4b reaches
+  0.7637 val macro-F1 after a single epoch, against 0.5277 for 4a, which is
+  consistent with this reading.
+- **Tokenizer coverage.** 4b uses a 32k Bengali-specific vocabulary; 4a draws
+  from a shared ~250k multilingual vocabulary and must express Bengali through
+  more, and more fragmented, subword units. On short informal posts this can
+  cost signal directly.
+- **Pretraining objective.** 4b is an ELECTRA-style replaced-token
+  discriminator while 4a is a masked-language model. Discriminative pretraining
+  often transfers more readily to classification.
+- **Capacity versus dataset size.** 4b is roughly a third the size of 4a and is
+  trained on 3917 examples. The smaller model may simply be better regularised
+  for a dataset of this size, and 4a's larger capacity may be partly redundant.
+- **Shared hyperparameters.** Both conditions use the same learning rate,
+  schedule and batch size. That recipe may not be equally appropriate for both
+  backbones, so part of the gap could reflect tuning asymmetry rather than
+  representation quality.
 
-The validation curves settle the question directly:
+### Seed variability and training dynamics
 
-- **4b converges much faster.** After one epoch it is already at
-  0.7637 val macro-F1, versus
-  0.5277 for 4a. A Bengali-specific vocabulary makes
-  fine-tuning a small, well-conditioned adjustment rather than a large
-  multilingual re-purposing.
-- **4b is at or past its plateau.** Its validation loss bottoms out in epoch 3
-  and ticks *up* in epoch 4 for all three seeds
-  (0.5117 -> 0.5305), while macro-F1
-  still edges up. That is a mild plateau / overfitting signature.
-- **4a is the one still climbing.** Its validation loss falls monotonically
-  through epoch 4 (0.5760 -> 0.5526) and the last
-  epoch still buys +0.011 to +0.028 macro-F1.
+Test macro-F1 varies by +/- 0.0313 across seeds for 4a and by +/- 0.0013 for 4b,
+a difference of roughly 23x. The same ordering holds for MAE and for both error
+directions. This describes **reproducibility**: 4b's final solution is largely
+insensitive to initialisation, while 4a's is not.
 
-If any condition would benefit from more training it is 4a, not 4b.
+Seed spread is not by itself a measure of how far training progressed. Low
+variance means the seeds converged on the same solution; it does not establish
+that this solution is a good one, since a model can be consistently wrong. Nor
+does high variance establish under-training, although wandering between basins
+is one common cause. The validation curves are the more direct evidence:
 
-That said, 4 epochs is short for both, and 4a's gradient norms ran roughly 6-44
-against `max_grad_norm` 1.0 throughout — heavily clipped. A longer schedule or a
-lower learning rate is a reasonable ablation. That is a scheduling question,
-though, and the low seed variance is not the evidence for it.
+- 4b starts high (0.7637 val macro-F1 after epoch 1) and its validation loss
+  reaches a minimum in epoch 3 (0.5117) before rising again in epoch 4
+  (0.5305) in all three seeds, while macro-F1 still edges upward. That is a
+  plateau or mild overfitting signature.
+- 4a starts much lower (0.5277) and improves steadily throughout. Its
+  validation loss falls monotonically across all four epochs (1.0781 to
+  0.5526) and the final epoch still contributes +0.011 to +0.028 macro-F1.
 
-### Per class: 4b is ahead on three of four
+Under this schedule 4a appears to have more room to improve than 4b. Other
+readings of the low variance are possible. A smaller model can have a smoother
+optimisation landscape and therefore lower seed sensitivity regardless of
+convergence. The checkpoint protocol also compresses variance: selection is on
+validation macro-F1 and in all six runs the final epoch was the best, so every
+run reports the epoch-4 state. Finally, some of the consistency may reflect a
+ceiling imposed by the data rather than the models — if the source labels carry
+annotator disagreement, achievable F1 is capped and different runs may
+converge on the same compromise.
 
-4b is better on mild (+0.018 F1), moderate (+0.092) and severe (+0.075). It is
-marginally worse on minimal (-0.005), which sits well inside the +/- 0.017 seed
-spread of either model and is not a meaningful difference. The one real
-exception is a wash.
+The schedule itself is short for both conditions. Gradient norms in 4a ran
+roughly 6-44 against a clipping threshold of 1.0 throughout training, so a
+longer schedule or a lower learning rate is a reasonable follow-up for either
+backbone.
 
-### `moderate` is the hard class for both
+### Class-level performance
 
-Both models peak on the endpoints and dip in the middle:
+Both models are strongest at the ends of the scale and weakest in the middle.
 
 | class | test support | 4a XLM-R | 4b BanglaBERT |
 |---|---|---|---|
@@ -154,56 +174,101 @@ Both models peak on the endpoints and dip in the middle:
 | moderate | 71 | 0.5950 +/- 0.0400 | 0.6865 +/- 0.0136 |
 | severe | 55 | 0.7845 +/- 0.0311 | 0.8590 +/- 0.0257 |
 
-`moderate` is an **ordinal interior class**, flanked by mild and severe. It
-absorbs confusion from both neighbours and loses cases to both, whereas
-`minimal` and `severe` have only one neighbour each. The confusion matrices show
-this clearly — for 4a the mild/moderate pair exchanges about 16 and 13 cases,
-and moderate also leaks about 9 cases up to severe.
+`moderate` is an ordinal interior class, flanked by `mild` and `severe`, so
+like `mild` it can lose cases in both directions whereas the endpoint classes
+cannot. It is the more exposed of the two interior classes. The confusion
+matrices show the resulting two-way traffic: for 4a the mild/moderate pair
+exchanges about 16 and 13 cases, and moderate also leaks about 9 cases upward
+to severe. `minimal` and `severe` each have a single neighbour and correspondingly
+fewer routes to error.
 
-Support is not the explanation: `moderate` has 71 test cases and `severe` only
-55, yet `severe` scores roughly 0.20 F1 higher. The difficulty is the boundary
-position, not the sample count. The loss already upweights `moderate` (weight
-1.30) so it is not being under-served either.
+Sample count does not account for the gap. `moderate` has 71 test cases and
+`severe` only 55, yet `severe` scores roughly 0.20 F1 higher; the loss also
+upweights `moderate` (1.30) almost as strongly as `severe` (1.66). Plausible
+contributing factors that the present runs cannot distinguish:
 
-4b improves `moderate` the most of any class (+0.092 F1), consistent with its
-vocabulary helping most where the lexical cues are subtlest.
+- **Label reliability at the boundaries.** If the source annotations are least
+  consistent between adjacent middle categories, `moderate` will be the noisiest
+  target regardless of model quality.
+- **Construct properties.** Severity is a continuum discretised into four
+  levels; the middle of such a scale is typically less separable than its
+  extremes.
+- **Feature overlap.** Posts in the middle band may share vocabulary with both
+  neighbours, so lexical evidence for the correct label is weaker.
+- **Class heterogeneity.** `moderate` may aggregate several distinct
+  presentations, making it internally more diverse than the endpoint classes.
+- **Measurement noise.** With 71 test cases this class has the widest seed
+  spread of any class for 4a (+/- 0.040). The gap to the other classes is much
+  larger than this, so noise is not the main story, but it inflates the
+  apparent difficulty.
 
-### Both models over-predict severity
+4b improves `moderate` more than any other class (+0.092 F1), which is
+consistent with its vocabulary helping most where the lexical cues are
+subtlest.
 
-Upgrade errors (predicting a higher severity than gold) outnumber downgrades in
-both conditions and in all six runs; mean signed error is positive everywhere.
-This is the expected signature of the **inverse-frequency class weighting**:
+### Error direction
 
-| class | train count | class weight |
+Both conditions produce more upgrade errors (predicted severity above gold)
+than downgrade errors, and mean signed error is positive in all six runs. The
+effect is small in magnitude — about +0.04 levels on a four-point scale.
+
+Part of this asymmetry is structural rather than learned. `minimal` is the
+floor of the scale and the largest class (210 test cases), so all of its errors
+are upgrades by construction; `severe` is the ceiling and the smallest class
+(55), so all of its errors are downgrades. In the mean confusion matrices,
+`minimal` alone accounts for about 51% of all upgrades in 4a and about 68% in
+4b, while `severe` supplies only about a quarter of all downgrades. Comparing
+the two rates therefore overstates any systematic bias.
+
+Looking only at the interior classes, where errors can go in either direction,
+the pattern differs by class and by model:
+
+| true class | 4a up / down | 4b up / down |
 |---|---|---|
-| minimal | 1677 | 0.4387 |
-| mild | 1232 | 0.5971 |
-| moderate | 566 | 1.2998 |
-| severe | 442 | 1.6644 |
+| mild | 17.0 / 13.7 | 10.7 / 10.7 |
+| moderate | 9.3 / 18.0 | 4.7 / 17.0 |
 
-Weighting raises recall on the rare high-severity classes at the cost of their
-precision, which means over-predicting them. The confusion matrices confirm the
-direction: for `moderate` and `severe`, recall exceeds precision in both models
-(4a severe 0.754 / 0.818), while `mild` shows the reverse (0.830 / 0.801) and
-spills upward. The bias is a deliberate trade for macro-F1 and QWK under the
-label-prior mismatch, not a defect.
+`mild` is close to balanced, and `moderate` is in fact downgraded more often
+than upgraded in both conditions. The net upgrade bias is driven mainly by the
+floor class rather than by a uniform tendency to overestimate severity.
 
-4b has a smaller error mass in both directions — fewer upgrades
-(0.0973 vs 0.1095) and fewer downgrades
-(0.0714 vs 0.0850) — so it is
-simply more accurate in both directions rather than differently biased.
+The marginal distributions show where each model's boundary is displaced. 4a
+slightly over-predicts `moderate` (+5.0 cases) and `severe` (+4.7) and
+under-predicts `minimal` (-4.3) and `mild` (-5.3), a mild upward shift toward
+the top of the scale. 4b is close to calibrated on `moderate` (+1.7) and
+`severe` (+1.0) but under-predicts `minimal` heavily (-13.7) and over-predicts
+`mild` (+11.0) — a local displacement at the bottom boundary rather than a
+global shift.
 
-## Caveats
+The inverse-frequency class weights are one candidate explanation for the
+upward displacement: they raise the cost of missing the rare high-severity
+classes (weight 1.66 for `severe`, 1.30 for `moderate`) and so raise their
+recall at the expense of their precision. The precision/recall pairs are
+consistent with this — recall exceeds precision for `moderate` and `severe` in
+both models, while `mild` shows the reverse and absorbs cases from below.
+Alternatives include the argmax decision rule under weighted training, which
+shifts the effective thresholds between classes, and residual effects of the
+label prior, which is not resampled. A logit-adjustment ablation would separate
+these from the weighting itself.
 
-- **n=3 seeds.** The +/- values are sample standard deviations over three runs;
-  they describe seed spread, not a confidence interval over test examples.
+4b has less error mass in both directions — fewer upgrades (0.0973 against
+0.1095) and fewer downgrades (0.0714 against 0.0850) — so it is more accurate
+in both directions rather than differently biased.
+
+## Limitations
+
+- **n=3 seeds.** The +/- values are sample standard deviations over three runs
+  and describe seed spread, not confidence intervals over test examples.
 - Per-run **bootstrap 95% CIs** for macro-F1, QWK and the downgrade rate are
-  inside each `eval_test.json` under `ci95`.
+  stored inside each `eval_test.json` under `ci95`.
 - No significance test between conditions yet. McNemar comparisons are planned
-  once there is more than one configuration to compare against.
-- `accuracy` is included for completeness but is misleading on this prior —
+  once more than one configuration exists to compare against.
+- Both conditions share one hyperparameter recipe. The comparison may partly
+  reflect tuning asymmetry rather than backbone quality.
+- The test split is a single held-out set of 490 examples; per-class estimates,
+  especially for `severe` (55 cases), have limited statistical power.
+- `accuracy` is reported for completeness but is misleading on this prior —
   `minimal` alone is 43% of the train split. Macro-F1 and QWK are the primary
   measures.
-- Checkpoints live in a **private** Hub repo and should stay private: the source
-  datasets state no licence, so trained weights should not be published until
-  that is settled.
+- The source datasets state no licence. Trained weights should not be
+  redistributed until that is settled.
