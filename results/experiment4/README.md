@@ -4,11 +4,11 @@ Condition 4 of the research design: fine-tune and evaluate on **native** Bengali
 data, with no translation anywhere in the pipeline. Two conditions share the
 identical splits and training recipe; only the backbone differs.
 
-| | 4a (controlled) | 4b (specialized) |
-|---|---|---|
-| backbone | `FacebookAI/xlm-roberta-base` | `csebuetnlp/banglabert` |
-| role | common controlled backbone, also used for cross-lingual transfer | Bengali-specific oracle |
-| parameters | ~278M | ~102M |
+|            | 4a (controlled)                                                  | 4b (specialized)        |
+| ---------- | ---------------------------------------------------------------- | ----------------------- |
+| backbone   | `FacebookAI/xlm-roberta-base`                                    | `csebuetnlp/banglabert` |
+| role       | common controlled backbone, also used for cross-lingual transfer | Bengali-specific oracle |
+| parameters | ~278M                                                            | ~102M                   |
 
 Setup: 3 seeds (42/43/44), class-weighted cross-entropy, max length 256, lr
 2e-5, batch 16, 4 epochs, weight decay 0.01, early-stopping patience 3. Best
@@ -27,67 +27,64 @@ Each `{run}_seed{N}/` directory holds the two artefacts written by
 - `train_metrics.json` — training summary: final train loss, runtime, label
   counts and the inverse-frequency class weights.
 
-Model checkpoints are not part of this repository. The source datasets state no
-licence, so trained weights are not redistributed here.
-
 Driver: [`notebooks/experiment4_native.ipynb`](../../notebooks/experiment4_native.ipynb).
 
 ## Results
 
-| metric | 4a XLM-R | 4b BanglaBERT |
-|---|---|---|
+| metric   | 4a XLM-R          | 4b BanglaBERT     |
+| -------- | ----------------- | ----------------- |
 | macro-F1 | 0.7682 +/- 0.0313 | 0.8130 +/- 0.0013 |
-| QWK | 0.7798 +/- 0.0136 | 0.8287 +/- 0.0084 |
-| MAE | 0.2707 +/- 0.0290 | 0.2204 +/- 0.0108 |
+| QWK      | 0.7798 +/- 0.0136 | 0.8287 +/- 0.0084 |
+| MAE      | 0.2707 +/- 0.0290 | 0.2204 +/- 0.0108 |
 | accuracy | 0.8054 +/- 0.0286 | 0.8313 +/- 0.0101 |
 
-| error direction | 4a XLM-R | 4b BanglaBERT |
-|---|---|---|
-| upgrade rate (pred > gold) | 0.1095 +/- 0.0125 | 0.0973 +/- 0.0139 |
+| error direction              | 4a XLM-R          | 4b BanglaBERT     |
+| ---------------------------- | ----------------- | ----------------- |
+| upgrade rate (pred > gold)   | 0.1095 +/- 0.0125 | 0.0973 +/- 0.0139 |
 | downgrade rate (pred < gold) | 0.0850 +/- 0.0183 | 0.0714 +/- 0.0041 |
-| error rate | 0.1946 +/- 0.0286 | 0.1687 +/- 0.0101 |
+| error rate                   | 0.1946 +/- 0.0286 | 0.1687 +/- 0.0101 |
 
-|  | 4a XLM-R | 4b BanglaBERT |
-|---|---|---|
+|                                 | 4a XLM-R          | 4b BanglaBERT     |
+| ------------------------------- | ----------------- | ----------------- |
 | mean signed error (pred - gold) | 0.0381 +/- 0.0139 | 0.0354 +/- 0.0249 |
 
 Per-class F1:
 
-| class | test support | 4a XLM-R | 4b BanglaBERT |
-|---|---|---|---|
-| minimal | 210 | 0.8790 +/- 0.0169 | 0.8741 +/- 0.0184 |
-| mild | 154 | 0.8143 +/- 0.0390 | 0.8322 +/- 0.0187 |
-| moderate | 71 | 0.5950 +/- 0.0400 | 0.6865 +/- 0.0136 |
-| severe | 55 | 0.7845 +/- 0.0311 | 0.8590 +/- 0.0257 |
+| class    | test support | 4a XLM-R          | 4b BanglaBERT     |
+| -------- | ------------ | ----------------- | ----------------- |
+| minimal  | 210          | 0.8790 +/- 0.0169 | 0.8741 +/- 0.0184 |
+| mild     | 154          | 0.8143 +/- 0.0390 | 0.8322 +/- 0.0187 |
+| moderate | 71           | 0.5950 +/- 0.0400 | 0.6865 +/- 0.0136 |
+| severe   | 55           | 0.7845 +/- 0.0311 | 0.8590 +/- 0.0257 |
 
 Precision / recall (mean across seeds):
 
-| class | 4a XLM-R P / R | 4b BanglaBERT P / R |
-|---|---|---|
-| minimal | 0.8889 / 0.8698 | 0.9053 / 0.8460 |
-| mild | 0.8305 / 0.8009 | 0.8059 / 0.8615 |
-| moderate | 0.5776 / 0.6150 | 0.6793 / 0.6948 |
-| severe | 0.7538 / 0.8182 | 0.8519 / 0.8667 |
+| class    | 4a XLM-R P / R  | 4b BanglaBERT P / R |
+| -------- | --------------- | ------------------- |
+| minimal  | 0.8889 / 0.8698 | 0.9053 / 0.8460     |
+| mild     | 0.8305 / 0.8009 | 0.8059 / 0.8615     |
+| moderate | 0.5776 / 0.6150 | 0.6793 / 0.6948     |
+| severe   | 0.7538 / 0.8182 | 0.8519 / 0.8667     |
 
 Class weights used by the loss, from `train_metrics.json`:
 
-| class | train count | class weight |
-|---|---|---|
-| minimal | 1677 | 0.4387 |
-| mild | 1232 | 0.5971 |
-| moderate | 566 | 1.2998 |
-| severe | 442 | 1.6644 |
+| class    | train count | class weight |
+| -------- | ----------- | ------------ |
+| minimal  | 1677        | 0.4387       |
+| mild     | 1232        | 0.5971       |
+| moderate | 566         | 1.2998       |
+| severe   | 442         | 1.6644       |
 
 Validation trajectory during training (mean across seeds). The logs come from
 the notebook's `train.py` output; the epoch-4 checkpoint is the one selected and
 scored above.
 
 | epoch | 4a val macro-F1 / val loss | 4b val macro-F1 / val loss |
-|---|---|---|
-| 1 | 0.5277 / 1.0781 | 0.7637 / 0.6155 |
-| 2 | 0.7392 / 0.6388 | 0.8135 / 0.5149 |
-| 3 | 0.7728 / 0.5760 | 0.8236 / 0.5117 |
-| 4 | 0.7940 / 0.5526 | 0.8378 / 0.5305 |
+| ----- | -------------------------- | -------------------------- |
+| 1     | 0.5277 / 1.0781            | 0.7637 / 0.6155            |
+| 2     | 0.7392 / 0.6388            | 0.8135 / 0.5149            |
+| 3     | 0.7728 / 0.5760            | 0.8236 / 0.5117            |
+| 4     | 0.7940 / 0.5526            | 0.8378 / 0.5305            |
 
 ## Interpretation
 
@@ -101,9 +98,10 @@ about 0.22 on this split.
 
 The advantage is not uniform across classes. 4b is ahead on mild (+0.018 F1),
 moderate (+0.092) and severe (+0.075), and marginally behind on minimal
-(-0.005). The mild difference falls inside the +/- 0.017 seed spread of either
-model, so only the moderate and severe gaps are clearly outside run-to-run
-noise.
+(-0.005). The mild and minimal differences are small relative to their own
+seed spread (mild +/- 0.0390 for 4a, +/- 0.0187 for 4b; minimal +/- 0.0169 and
++/- 0.0184), so only the moderate and severe gaps are clearly outside
+run-to-run noise.
 
 Several mechanisms could produce this ordering, and the current runs do not
 separate them:
@@ -167,12 +165,12 @@ backbone.
 
 Both models are strongest at the ends of the scale and weakest in the middle.
 
-| class | test support | 4a XLM-R | 4b BanglaBERT |
-|---|---|---|---|
-| minimal | 210 | 0.8790 +/- 0.0169 | 0.8741 +/- 0.0184 |
-| mild | 154 | 0.8143 +/- 0.0390 | 0.8322 +/- 0.0187 |
-| moderate | 71 | 0.5950 +/- 0.0400 | 0.6865 +/- 0.0136 |
-| severe | 55 | 0.7845 +/- 0.0311 | 0.8590 +/- 0.0257 |
+| class    | test support | 4a XLM-R          | 4b BanglaBERT     |
+| -------- | ------------ | ----------------- | ----------------- |
+| minimal  | 210          | 0.8790 +/- 0.0169 | 0.8741 +/- 0.0184 |
+| mild     | 154          | 0.8143 +/- 0.0390 | 0.8322 +/- 0.0187 |
+| moderate | 71           | 0.5950 +/- 0.0400 | 0.6865 +/- 0.0136 |
+| severe   | 55           | 0.7845 +/- 0.0311 | 0.8590 +/- 0.0257 |
 
 `moderate` is an ordinal interior class, flanked by `mild` and `severe`, so
 like `mild` it can lose cases in both directions whereas the endpoint classes
@@ -224,9 +222,9 @@ Looking only at the interior classes, where errors can go in either direction,
 the pattern differs by class and by model:
 
 | true class | 4a up / down | 4b up / down |
-|---|---|---|
-| mild | 17.0 / 13.7 | 10.7 / 10.7 |
-| moderate | 9.3 / 18.0 | 4.7 / 17.0 |
+| ---------- | ------------ | ------------ |
+| mild       | 17.0 / 13.7  | 10.7 / 10.7  |
+| moderate   | 9.3 / 18.0   | 4.7 / 17.0   |
 
 `mild` is close to balanced, and `moderate` is in fact downgraded more often
 than upgraded in both conditions. The net upgrade bias is driven mainly by the
@@ -270,5 +268,3 @@ in both directions rather than differently biased.
 - `accuracy` is reported for completeness but is misleading on this prior —
   `minimal` alone is 43% of the train split. Macro-F1 and QWK are the primary
   measures.
-- The source datasets state no licence. Trained weights should not be
-  redistributed until that is settled.
