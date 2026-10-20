@@ -1,0 +1,23 @@
+{
+  "train_runtime": 745.9479,
+  "train_samples_per_second": 15.24,
+  "train_steps_per_second": 0.954,
+  "total_flos": 1147743922251264.0,
+  "train_loss": 1.098468535401848,
+  "epoch": 4.0,
+  "label_counts": {
+    "minimal": 2069,
+    "mild": 232,
+    "moderate": 315,
+    "severe": 226
+  },
+  "class_weights": {
+    "minimal": 0.156,
+    "mild": 1.3912,
+    "moderate": 1.0246,
+    "severe": 1.4281
+  },
+  "model_id": "FacebookAI/xlm-roberta-base",
+  "lang": "en",
+  "seed": 42
+}
