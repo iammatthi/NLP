@@ -10,6 +10,9 @@ __pycache__/
 # generated experiment artefacts
 data/splits/
 outputs/
+data/translated/
+results/experiment5_llm/*/raw.jsonl
+results/experiment5_llm/*_smoke/
 
 # notebook / editor
 .ipynb_checkpoints/

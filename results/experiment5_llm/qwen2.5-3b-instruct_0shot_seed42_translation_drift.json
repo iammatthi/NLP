@@ -1,0 +1,60 @@
+{
+  "n_paired": 490,
+  "n_failed_or_missing": 0,
+  "transition_matrix_rows_bn_columns_bn2en": [
+    [
+      211,
+      10,
+      18,
+      50
+    ],
+    [
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      17,
+      3,
+      40,
+      62
+    ],
+    [
+      2,
+      0,
+      9,
+      67
+    ]
+  ],
+  "translation_downgraded": 31,
+  "translation_upgraded": 141,
+  "mcnemar_correctness": {
+    "b01": 59,
+    "b10": 32,
+    "chi2": 7.428571428571429,
+    "p_value": 0.006105521074524772
+  },
+  "downgrade_rate_by_gold_class": {
+    "minimal": {
+      "n": 210,
+      "downgraded": 17,
+      "downgrade_rate": 0.08095238095238096
+    },
+    "mild": {
+      "n": 154,
+      "downgraded": 9,
+      "downgrade_rate": 0.05844155844155844
+    },
+    "moderate": {
+      "n": 71,
+      "downgraded": 2,
+      "downgrade_rate": 0.028169014084507043
+    },
+    "severe": {
+      "n": 55,
+      "downgraded": 3,
+      "downgrade_rate": 0.05454545454545454
+    }
+  }
+}
