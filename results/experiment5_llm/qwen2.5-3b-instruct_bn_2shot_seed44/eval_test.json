@@ -1,0 +1,113 @@
+{
+  "macro_f1": 0.15,
+  "mae": 0.9408163265306122,
+  "qwk": 0.0,
+  "accuracy": 0.42857142857142855,
+  "minimal": 0.6,
+  "mild": 0.0,
+  "moderate": 0.0,
+  "severe": 0.0,
+  "direction": {
+    "n": 490,
+    "ok": 210,
+    "downgrade": 280,
+    "upgrade": 0,
+    "error_rate": 0.5714285714285714,
+    "downgrade_rate": 0.5714285714285714,
+    "upgrade_rate": 0.0,
+    "downgrade_share_of_errors": 1.0,
+    "mean_signed_error": -0.9408163265306122
+  },
+  "confusion": [
+    [
+      210,
+      0,
+      0,
+      0
+    ],
+    [
+      154,
+      0,
+      0,
+      0
+    ],
+    [
+      71,
+      0,
+      0,
+      0
+    ],
+    [
+      55,
+      0,
+      0,
+      0
+    ]
+  ],
+  "classification_report": {
+    "minimal": {
+      "precision": 0.42857142857142855,
+      "recall": 1.0,
+      "f1-score": 0.6,
+      "support": 210.0
+    },
+    "mild": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 154.0
+    },
+    "moderate": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 71.0
+    },
+    "severe": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 55.0
+    },
+    "accuracy": 0.42857142857142855,
+    "macro avg": {
+      "precision": 0.10714285714285714,
+      "recall": 0.25,
+      "f1-score": 0.15,
+      "support": 490.0
+    },
+    "weighted avg": {
+      "precision": 0.1836734693877551,
+      "recall": 0.42857142857142855,
+      "f1-score": 0.2571428571428571,
+      "support": 490.0
+    }
+  },
+  "experiment": 5,
+  "condition": "bn",
+  "backend": "hf",
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "shots_per_class": 2,
+  "seed": 44,
+  "lang": "bn",
+  "split": "test",
+  "mode": "argmax",
+  "n": 490,
+  "n_total": 490,
+  "n_failed": 0,
+  "coverage": 1.0,
+  "ci95": {
+    "macro_f1": [
+      0.13970588235294118,
+      0.16066481994459833
+    ],
+    "downgrade_rate": [
+      0.5265306122448979,
+      0.6122448979591837
+    ],
+    "qwk": [
+      0.0,
+      0.0
+    ]
+  }
+}
