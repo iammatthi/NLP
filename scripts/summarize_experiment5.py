@@ -18,6 +18,8 @@ def _mean_std(values: list[float]) -> str:
 def collect(root: Path) -> list[dict]:
     rows = []
     for path in sorted(root.glob("*/eval_test.json")):
+        if "_smoke" in path.parent.name:
+            continue
         report = json.loads(path.read_text(encoding="utf-8"))
         if report.get("n_total") is None or report.get("mode") != "argmax":
             continue
@@ -36,7 +38,7 @@ def build_readme(rows: list[dict]) -> str:
         "Zero-/few-shot LLM severity classification on the shared Bengali test split.",
         "The headline comparison is `bn` versus `bn2en`; `en` is a sanity check only.",
         "",
-        "Results remain pending until real Colab runs are completed.",
+        "The table below summarizes completed runs; smoke-test directories are excluded.",
         "",
         "## Results",
         "",
