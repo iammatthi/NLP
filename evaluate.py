@@ -1,4 +1,4 @@
-"""Evaluate a trained experiment-4 checkpoint on a held-out split.
+"""Evaluate a trained severity classifier on a held-out split.
 
 Writes the full ordinal metric suite: macro-F1, per-class F1, MAE, QWK, and
 the upgrade/ok/downgrade error-direction matrix (downgrade = pred < gold),
@@ -11,6 +11,7 @@ checkpoint it describes.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -43,6 +44,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bootstrap", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--out", type=Path, default=None)
+    parser.add_argument("--predictions-out", type=Path, default=None,
+                        help="optional row-aligned test predictions CSV")
     return parser.parse_args()
 
 
@@ -103,6 +106,18 @@ def main() -> None:
     print(f"split={args.split}  n={len(frame)}  model={args.model_dir}")
 
     y_pred = predict(args.model_dir, texts, args.max_length, args.batch_size)
+
+    if args.predictions_out is not None:
+        import pandas as pd
+
+        predictions = pd.DataFrame({
+            "split_row": np.arange(len(frame)),
+            "source_sha256": [hashlib.sha256(text.encode("utf-8")).hexdigest() for text in texts],
+            "label": y_true,
+            "prediction": y_pred,
+        })
+        args.predictions_out.parent.mkdir(parents=True, exist_ok=True)
+        predictions.to_csv(args.predictions_out, index=False)
 
     report = full_report(y_true, y_pred)
     report["n"] = int(len(frame))

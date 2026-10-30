@@ -1,11 +1,11 @@
-"""Fine-tune a backbone on the native-language severity splits (experiment 4).
+"""Fine-tune a backbone on severity splits.
 
 Condition 4a (controlled)  : `--model xlmr`
 Condition 4b (specialized) : `--model banglabert`
 
-Both conditions train and evaluate on the *same* native splits; only the
-backbone differs. Class-weighted cross-entropy counteracts the label prior
-without resampling. Checkpoints are selected on validation macro-F1.
+Experiment 2 can provide translated English splits with --splits-dir.
+Class-weighted cross-entropy counteracts the label prior without resampling.
+Checkpoints are selected on validation macro-F1.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ from transformers import (
 from src.dataset import SeverityDataset
 from src.losses import weighted_cross_entropy
 from src.metrics import compute_metrics_for_trainer
-from src.schema import LEVELS, LEVEL_NAMES, class_weights, load_split, to_domain_label
+from src.schema import LEVELS, LEVEL_NAMES, SPLITS_DIR, class_weights, load_split, to_domain_label
 
 MODEL_CHOICES = {
     "xlmr": "FacebookAI/xlm-roberta-base",
@@ -47,6 +47,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True, help="HF id or alias: xlmr | banglabert")
     parser.add_argument("--lang", choices=("bn", "en"), default="bn")
+    parser.add_argument("--splits-dir", type=Path, default=SPLITS_DIR)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--max-length", type=int, default=256)
@@ -75,8 +76,8 @@ def main() -> None:
     set_seed(args.seed)
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    train_df = load_split(args.lang, "train")
-    val_df = load_split(args.lang, "val")
+    train_df = load_split(args.lang, "train", out_dir=args.splits_dir)
+    val_df = load_split(args.lang, "val", out_dir=args.splits_dir)
     print(f"train={len(train_df)}  val={len(val_df)}  model={model_id}")
 
     labels = train_df["label"].to_numpy()
@@ -154,6 +155,7 @@ def main() -> None:
     metrics["class_weights"] = weight_map if not args.no_class_weights else None
     metrics["model_id"] = model_id
     metrics["lang"] = args.lang
+    metrics["splits_dir"] = str(args.splits_dir)
     metrics["seed"] = args.seed
     (args.output_dir / "train_metrics.json").write_text(json.dumps(metrics, indent=2))
 

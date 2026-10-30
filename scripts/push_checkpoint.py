@@ -21,8 +21,8 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-METRIC_FILES = ("train_metrics.json", "val_predictions.npz")
-NESTED_METRIC_FILES = ("final/eval_test.json",)
+METRIC_FILES = ("train_metrics.json", "val_predictions.npz", "provenance.json")
+NESTED_METRIC_FILES = ("final/eval_test.json", "final/predictions_bn_test.csv")
 
 
 def parse_args() -> argparse.Namespace:
