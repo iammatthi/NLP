@@ -16,6 +16,7 @@ dependencies = [
     "spacy>=3.8.16",
     "torch>=2.14.1",
     "transformers==5.18.0",
+    "typesafe-sdk>=0.1.0",
 ]
 
 [build-system]

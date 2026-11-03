@@ -21,6 +21,7 @@ and zero-/few-shot LLMs for detecting mental health severity in low-resource lan
 | **4a** | Native (controlled) | BN-train | **XLM-R** | BN-test (native) |
 | **4b** | Native (specialized) | BN-train | **BanglaBERT** | BN-test (native) |
 | 5 | LLM baselines (zero-/few-shot) | prompts | proprietary + compact open-weight | BN-test (native) |
+| 6 | System One decision model (zero-shot) | clinical rubric | **Jev** (`jev-1.14.0`, Choice & Score) | BN-test (native), EN-test |
 
 Design rationale:
 
@@ -199,6 +200,7 @@ Conventions the notebook assumes:
 | Logit-adjustment ablation | not started |
 | SHAP (RQ2) | not started |
 | LLM baselines (config 5) | not started |
+| Experiment 6 (Jev System One zero-shot) | done — `Choice` & `Score` on `bn-test` and `en-test`, [results](results/experiment6/README.md) (`evaluate_jev.py`, `notebooks/experiment6_jev.ipynb`) |
 
 ### Preparing English-to-Bengali translations
 

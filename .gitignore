@@ -18,3 +18,7 @@ results/experiment5_llm/*_smoke/
 # notebook / editor
 .ipynb_checkpoints/
 .DS_Store
+
+# environment / secrets
+.env
+.env.*

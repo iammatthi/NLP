@@ -1,0 +1,127 @@
+{
+  "macro_f1": 0.42908390712153455,
+  "mae": 0.5533707865168539,
+  "qwk": 0.3690186688615361,
+  "accuracy": 0.6573033707865169,
+  "minimal": 0.8121212121212121,
+  "mild": 0.2696629213483146,
+  "moderate": 0.3488372093023256,
+  "severe": 0.2857142857142857,
+  "direction": {
+    "n": 356,
+    "ok": 234,
+    "downgrade": 53,
+    "upgrade": 69,
+    "error_rate": 0.34269662921348315,
+    "downgrade_rate": 0.14887640449438203,
+    "upgrade_rate": 0.19382022471910113,
+    "downgrade_share_of_errors": 0.4344262295081967,
+    "mean_signed_error": 0.0028089887640449437
+  },
+  "confusion": [
+    [
+      201,
+      34,
+      18,
+      6
+    ],
+    [
+      8,
+      12,
+      9,
+      0
+    ],
+    [
+      17,
+      6,
+      15,
+      2
+    ],
+    [
+      10,
+      8,
+      4,
+      6
+    ]
+  ],
+  "classification_report": {
+    "minimal": {
+      "precision": 0.8516949152542372,
+      "recall": 0.7760617760617761,
+      "f1-score": 0.8121212121212121,
+      "support": 259.0
+    },
+    "mild": {
+      "precision": 0.2,
+      "recall": 0.41379310344827586,
+      "f1-score": 0.2696629213483146,
+      "support": 29.0
+    },
+    "moderate": {
+      "precision": 0.32608695652173914,
+      "recall": 0.375,
+      "f1-score": 0.3488372093023256,
+      "support": 40.0
+    },
+    "severe": {
+      "precision": 0.42857142857142855,
+      "recall": 0.21428571428571427,
+      "f1-score": 0.2857142857142857,
+      "support": 28.0
+    },
+    "accuracy": 0.6573033707865169,
+    "macro avg": {
+      "precision": 0.45158832508685126,
+      "recall": 0.4447851484489415,
+      "f1-score": 0.42908390712153455,
+      "support": 356.0
+    },
+    "weighted avg": {
+      "precision": 0.7062709587407782,
+      "recall": 0.6573033707865169,
+      "f1-score": 0.674475019748843,
+      "support": 356.0
+    }
+  },
+  "n": 356,
+  "lang": "en",
+  "split": "test",
+  "model_dir": "6a_jev_choice_en",
+  "ci95": {
+    "macro_f1": [
+      0.3617550543456664,
+      0.4904167590368433
+    ],
+    "downgrade_rate": [
+      0.11235955056179775,
+      0.1853932584269663
+    ],
+    "qwk": [
+      0.25878775077785054,
+      0.47853436316220005
+    ]
+  },
+  "graded": {
+    "graded_precision": 0.7722772277227723,
+    "graded_recall": 0.8153310104529616,
+    "graded_fscore": 0.7932203389830508
+  },
+  "calibration": {
+    "ece_10bin": 0.15654494382022474,
+    "mean_max_prob": 0.8138483146067417,
+    "mean_sdk_confidence": 0.7517696629213483,
+    "predicted_class_counts": {
+      "minimal": 236,
+      "mild": 60,
+      "moderate": 46,
+      "severe": 14
+    },
+    "true_class_counts": {
+      "minimal": 259,
+      "mild": 29,
+      "moderate": 40,
+      "severe": 28
+    }
+  },
+  "primitive": "Choice"
+}
