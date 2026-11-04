@@ -196,7 +196,8 @@ Conventions the notebook assumes:
 | Experiment 1 (zero-shot EN -> BN) end-to-end | done — 3 seeds on Colab, [results](results/experiment1/README.md) |
 | Colab notebook for experiment 1 | done (`notebooks/experiment1_zeroshot.ipynb`) |
 | Translation (configs 2–3) | partial — full English dataset translated to Bengali; Bengali-to-English pending |
-| Experiment 2 notebook | prepared; training and evaluation not yet run |
+| Experiment 2 (translate-train EN→BN) end-to-end | done — 3 seeds on Colab, [results](results/experiment2/README.md) |
+| Colab notebook for experiment 2 | done (`notebooks/experiment2_translate_train.ipynb`) |
 | Logit-adjustment ablation | not started |
 | SHAP (RQ2) | not started |
 | LLM baselines (config 5) | not started |

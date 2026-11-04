@@ -9,9 +9,9 @@ __pycache__/
 
 # generated experiment artefacts
 data/splits/
-data/translated/
+data/translated/*.json
+data/translated/*.jsonl
 outputs/
-data/translated/
 results/experiment5_llm/*/raw.jsonl
 results/experiment5_llm/*_smoke/
 
