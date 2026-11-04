@@ -31,7 +31,7 @@ from src.metrics import (
     macro_f1,
     qwk,
 )
-from src.schema import LEVELS, LEVEL_NAMES, load_split, to_domain_label
+from src.schema import LEVELS, LEVEL_NAMES, SPLITS_DIR, load_split, to_domain_label
 
 
 def parse_args() -> argparse.Namespace:
@@ -39,6 +39,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-dir", type=Path, required=True)
     parser.add_argument("--lang", choices=("bn", "en"), default="bn")
     parser.add_argument("--split", choices=("test", "val"), default="test")
+    parser.add_argument("--splits-dir", type=Path, default=SPLITS_DIR,
+                        help="split directory; use data/splits/bn_to_en for experiment 3")
     parser.add_argument("--max-length", type=int, default=256)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--bootstrap", type=int, default=1000)
@@ -100,7 +102,7 @@ def bootstrap_cis(
 
 def main() -> None:
     args = parse_args()
-    frame = load_split(args.lang, args.split)
+    frame = load_split(args.lang, args.split, out_dir=args.splits_dir)
     texts = frame["text"].tolist()
     y_true = frame["label"].to_numpy(dtype=int)
     print(f"split={args.split}  n={len(frame)}  model={args.model_dir}")
@@ -123,6 +125,7 @@ def main() -> None:
     report["n"] = int(len(frame))
     report["lang"] = args.lang
     report["split"] = args.split
+    report["splits_dir"] = str(args.splits_dir)
     report["model_dir"] = str(args.model_dir)
     report["ci95"] = bootstrap_cis(y_true, y_pred, args.bootstrap, args.seed)
 
