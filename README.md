@@ -13,21 +13,21 @@ and zero-/few-shot LLMs for detecting mental health severity in low-resource lan
 
 ## Experimental configurations
 
-| # | Condition | Train data | Backbone | Test data |
-|---|-----------|------------|----------|-----------|
-| 1 | Zero-Shot Cross-Lingual Transfer | EN-train | XLM-R | BN-test (native) |
-| 2 | Translate-Train | EN-train → translated to BN | **XLM-R** | BN-test (native) |
-| 3 | Translate-Test | EN-train | **same XLM-R as #1** | BN-test → translated to EN |
-| **4a** | Native (controlled) | BN-train | **XLM-R** | BN-test (native) |
-| **4b** | Native (specialized) | BN-train | **BanglaBERT** | BN-test (native) |
-| 5 | LLM baselines (zero-/few-shot) | prompts | proprietary + compact open-weight | BN-test (native) |
-| 6 | System One decision model (zero-shot) | clinical rubric | **Jev** (`jev-1.14.0`, Choice & Score) | BN-test (native), EN-test |
+| #      | Condition                             | Train data                  | Backbone                               | Test data                  |
+| ------ | ------------------------------------- | --------------------------- | -------------------------------------- | -------------------------- |
+| 1      | Zero-Shot Cross-Lingual Transfer      | EN-train                    | XLM-R                                  | BN-test (native)           |
+| 2      | Translate-Train                       | EN-train → translated to BN | **XLM-R**                              | BN-test (native)           |
+| 3      | Translate-Test                        | EN-train                    | **same XLM-R as #1**                   | BN-test → translated to EN |
+| **4a** | Native (controlled)                   | BN-train                    | **XLM-R**                              | BN-test (native)           |
+| **4b** | Native (specialized)                  | BN-train                    | **BanglaBERT**                         | BN-test (native)           |
+| 5      | LLM baselines (zero-/few-shot)        | prompts                     | proprietary + compact open-weight      | BN-test (native)           |
+| 6      | System One decision model (zero-shot) | clinical rubric             | **Jev** (`jev-1.14.0`, Choice & Score) | BN-test (native), EN-test  |
 
 Design rationale:
 
-- **#1 vs #3** share identical model weights — only the *test representation* differs. This is the
+- **#1 vs #3** share identical model weights — only the _test representation_ differs. This is the
   cleanest pairing in the paper and directly feeds RQ2.
-- **#1/#2/#4a** share an identical backbone — isolates the *training-data strategy* (raw EN vs.
+- **#1/#2/#4a** share an identical backbone — isolates the _training-data strategy_ (raw EN vs.
   translated EN vs. native BN).
 - **#4b** is the "how much does a native LM add beyond native data" oracle. Report it in the same
   table but label it as non-controlled (architecture, tokenizer and pretraining corpus all differ).
@@ -36,10 +36,10 @@ Design rationale:
 
 Both files are byte-identical to their published sources (verified by md5).
 
-| File | Source | Language | Labels | n | License |
-|------|--------|----------|--------|---|---------|
-| `data/raw/depression-severity-bengali.xlsx` | Kabir et al. 2022, *JMIR Formative Research* — [omanwhatiscomputer/depression-severity](https://github.com/omanwhatiscomputer/depression-severity) | Bengali (blogs, microblogs, Facebook groups) | 4-level ordinal int `1–4`, DSM-5-adherent, validated by BRAC University counselors | 4897 | none stated (article is CC BY 4.0) |
-| `data/raw/depression-severity-english.csv` | Naseem et al. 2022, *WWW* — [usmaann/Depression_Severity_Dataset](https://github.com/usmaann/Depression_Severity_Dataset) | English (Reddit) | 4-level ordinal `minimum/mild/moderate/severe`, BDI + Depressive Disorder Annotation | 3553 | none stated |
+| File                                        | Source                                                                                                                                             | Language                                     | Labels                                                                               | n    | License                            |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------ | ---- | ---------------------------------- |
+| `data/raw/depression-severity-bengali.xlsx` | Kabir et al. 2022, _JMIR Formative Research_ — [omanwhatiscomputer/depression-severity](https://github.com/omanwhatiscomputer/depression-severity) | Bengali (blogs, microblogs, Facebook groups) | 4-level ordinal int `1–4`, DSM-5-adherent, validated by BRAC University counselors   | 4897 | none stated (article is CC BY 4.0) |
+| `data/raw/depression-severity-english.csv`  | Naseem et al. 2022, _WWW_ — [usmaann/Depression_Severity_Dataset](https://github.com/usmaann/Depression_Severity_Dataset)                          | English (Reddit)                             | 4-level ordinal `minimum/mild/moderate/severe`, BDI + Depressive Disorder Annotation | 3553 | none stated                        |
 
 These are the only two freely downloadable, text-bearing, 4-level ordinal depression-severity
 datasets in the [bucuram/depression-datasets-nlp](https://github.com/bucuram/depression-datasets-nlp)
@@ -48,12 +48,12 @@ surveys. Everything else is either binary, not severity-labeled, or gated behind
 
 ### Unified label schema
 
-| Level | Name | Bengali (`labels`) | English (`label`) |
-|-------|------|--------------------|-------------------|
-| 1 | minimal | `1` | `minimum` |
-| 2 | mild | `2` | `mild` |
-| 3 | moderate | `3` | `moderate` |
-| 4 | severe | `4` | `severe` |
+| Level | Name     | Bengali (`labels`) | English (`label`) |
+| ----- | -------- | ------------------ | ----------------- |
+| 1     | minimal  | `1`                | `minimum`         |
+| 2     | mild     | `2`                | `mild`            |
+| 3     | moderate | `3`                | `moderate`        |
+| 4     | severe   | `4`                | `severe`          |
 
 Bengali level semantics (from the Kabir et al. 2022 paper): **L4** suicidal attempts/inclinations,
 self-harm, schizophrenia/BPD dx; **L3** need for counseling/medication, clinical depression with
@@ -64,14 +64,14 @@ least problematic, occasional unhappiness.
 
 **Label prior mismatch** — the single largest confound:
 
-| | minimal | mild | moderate | severe |
-|---|---------|------|----------|--------|
-| Bengali (Kabir) | 2097 (43%) | 1540 (31%) | 707 (14%) | 553 (11%) |
-| English (Naseem) | 2587 (**73%**) | 290 (8%) | 394 (11%) | 282 (8%) |
+|                  | minimal        | mild       | moderate  | severe    |
+| ---------------- | -------------- | ---------- | --------- | --------- |
+| Bengali (Kabir)  | 2097 (43%)     | 1540 (31%) | 707 (14%) | 553 (11%) |
+| English (Naseem) | 2587 (**73%**) | 290 (8%)   | 394 (11%) | 282 (8%)  |
 
-English `mild` is *smaller* than `moderate` (non-monotonic). A model trained on English learns a
+English `mild` is _smaller_ than `moderate` (non-monotonic). A model trained on English learns a
 73%-minimal prior and will systematically **downgrade** Bengali cases — which is exactly the
-failure mode RQ2 studies. This is a *finding*, but it must be separated from the transfer-strategy
+failure mode RQ2 studies. This is a _finding_, but it must be separated from the transfer-strategy
 effect.
 
 Other asymmetries: Reddit posts (median ~80 words) vs. Bengali blogs/Facebook (median ~22 words);
@@ -89,7 +89,7 @@ Instead, two cheap controls:
 1. **Class-weighted loss** (inverse-frequency, computed from each run's own train split) in every
    run. No test information used.
 2. **One logit-adjustment ablation** on configs 1–3: post-hoc subtract `τ · log p_target(y)` from
-   the logits, *no retraining*. If the EN→BN gap collapses, the finding is "transfer works, priors
+   the logits, _no retraining_. If the EN→BN gap collapses, the finding is "transfer works, priors
    don't"; if it doesn't, it is a genuine language-transfer result.
 
 ## Models
@@ -102,7 +102,7 @@ shared multilingual embedding space.
 `csebuetnlp/banglabert` (ELECTRA-base, 12L/768h, 32k Bangla WordPiece, pre-trained on 16.6GB of
 Bangla) is used **only** for condition 4b. It is the strongest Bengali-native LM but is
 architecturally incompatible with XLM-R (ELECTRA vs. RoBERTa pretraining, Bangla-only tokenizer),
-so using it as the primary native condition would confound *strategy* with *model choice*.
+so using it as the primary native condition would confound _strategy_ with _model choice_.
 
 RQ2 (SHAP) runs exclusively on XLM-R rows: token-level attributions are only comparable within a
 single tokenizer, and XLM-R vs. BanglaBERT segment the same sentence differently.
@@ -149,24 +149,20 @@ boundary, where `to_model_label` / `to_domain_label` shift to 0..3 and back.
 
 ## Running it
 
-[`notebooks/experiment4_native.ipynb`](notebooks/experiment4_native.ipynb) drives
-experiment 4: it sets up Colab, trains 4a and 4b across 3 seeds each, scores the
-held-out test split, and pushes every best checkpoint to a private Hub repo as it
-finishes. Run the notebook end to end.
-
 [`notebooks/experiment2_translate_train.ipynb`](notebooks/experiment2_translate_train.ipynb)
 trains condition 2 across three training seeds on the translated English train
 and validation splits and evaluates on the native Bengali test split.
 
 [`notebooks/experiment3_translate_test.ipynb`](notebooks/experiment3_translate_test.ipynb)
-trains nothing: it downloads the experiment 1 checkpoints unchanged (private Hub
-repo `simonfrnd/nlp_experiment1`) and scores them on the Bengali test split
-translated to English, alongside a native-Bengali reference evaluation of the
-same checkpoints, so experiment 1 vs 3 differ only in the test representation.
-Evaluation artefacts are pushed to the private `iammatthi/nlp_experiment3` Hub repo.
+trains nothing: it downloads the experiment 1 checkpoints unchanged and scores them on the Bengali test split translated to English, alongside a native-Bengali reference evaluation of the same checkpoints, so experiment 1 vs 3 differ only in the test representation.
 
-| Experiment 4 | Experiment 2 | Experiment 3 |
-|---|---|---|
+[`notebooks/experiment4_native.ipynb`](notebooks/experiment4_native.ipynb) drives
+experiment 4: it sets up Colab, trains 4a and 4b across 3 seeds each, scores the
+held-out test split, and pushes every best checkpoint to a private Hub repo as it
+finishes. Run the notebook end to end.
+
+| Experiment 4                                                                                                                                                                      | Experiment 2                                                                                                                                                                               | Experiment 3                                                                                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iammatthi/NLP/blob/main/notebooks/experiment4_native.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iammatthi/NLP/blob/main/notebooks/experiment2_translate_train.ipynb) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iammatthi/NLP/blob/main/notebooks/experiment3_translate_test.ipynb) |
 
 Entry points — see each `--help` for flags, and the notebook for the invocation
@@ -192,26 +188,26 @@ Conventions the notebook assumes:
 
 ## Implementation status
 
-| Step | Status |
-|------|--------|
-| Schema + stratified splits | done (`src/schema.py`, `scripts/prepare_splits.py`) |
-| Local CPU build check | done (`scripts/smoke_test_model.py`) |
-| Training loop, class-weighted CE, early stopping | done (`train.py`) |
-| Ordinal metrics + bootstrap CIs | done (`evaluate.py`) |
-| Experiment 4a / 4b end-to-end | done — 3 seeds each on Colab, [results](results/experiment4/README.md) |
-| Colab notebook for experiment 4 | done (`notebooks/experiment4_native.ipynb`) |
-| Checkpoint persistence (private HF Hub repo) | done (`scripts/push_checkpoint.py`) |
-| Experiment 1 (zero-shot EN -> BN) end-to-end | done — 3 seeds on Colab, [results](results/experiment1/README.md) |
-| Colab notebook for experiment 1 | done (`notebooks/experiment1_zeroshot.ipynb`) |
-| Translation (configs 2–3) | done — full English→Bengali and Bengali→English datasets translated with Amazon Translate (`scripts/translate_english.py`, `scripts/translate_bengali.py`) |
-| Experiment 2 (translate-train EN→BN) end-to-end | done — 3 seeds on Colab, [results](results/experiment2/README.md) |
-| Colab notebook for experiment 2 | done (`notebooks/experiment2_translate_train.ipynb`) |
-| Experiment 3 (translate-test BN→EN) end-to-end | not started — [notebook](notebooks/experiment3_translate_test.ipynb) ready |
-| Colab notebook for experiment 3 | done (`notebooks/experiment3_translate_test.ipynb`) |
-| Logit-adjustment ablation | not started |
-| SHAP (RQ2) | not started |
-| LLM baselines (config 5) | not started |
-| Experiment 6 (Jev System One zero-shot) | done — `Choice` & `Score` on `bn-test` and `en-test`, [results](results/experiment6/README.md) (`evaluate_jev.py`, `notebooks/experiment6_jev.ipynb`) |
+| Step                                             | Status                                                                                                                                                     |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Schema + stratified splits                       | done (`src/schema.py`, `scripts/prepare_splits.py`)                                                                                                        |
+| Local CPU build check                            | done (`scripts/smoke_test_model.py`)                                                                                                                       |
+| Training loop, class-weighted CE, early stopping | done (`train.py`)                                                                                                                                          |
+| Ordinal metrics + bootstrap CIs                  | done (`evaluate.py`)                                                                                                                                       |
+| Experiment 4a / 4b end-to-end                    | done — 3 seeds each on Colab, [results](results/experiment4/README.md)                                                                                     |
+| Colab notebook for experiment 4                  | done (`notebooks/experiment4_native.ipynb`)                                                                                                                |
+| Checkpoint persistence (private HF Hub repo)     | done (`scripts/push_checkpoint.py`)                                                                                                                        |
+| Experiment 1 (zero-shot EN -> BN) end-to-end     | done — 3 seeds on Colab, [results](results/experiment1/README.md)                                                                                          |
+| Colab notebook for experiment 1                  | done (`notebooks/experiment1_zeroshot.ipynb`)                                                                                                              |
+| Translation (configs 2–3)                        | done — full English→Bengali and Bengali→English datasets translated with Amazon Translate (`scripts/translate_english.py`, `scripts/translate_bengali.py`) |
+| Experiment 2 (translate-train EN→BN) end-to-end  | done — 3 seeds on Colab, [results](results/experiment2/README.md)                                                                                          |
+| Colab notebook for experiment 2                  | done (`notebooks/experiment2_translate_train.ipynb`)                                                                                                       |
+| Experiment 3 (translate-test BN→EN) end-to-end   | not started — [notebook](notebooks/experiment3_translate_test.ipynb) ready                                                                                 |
+| Colab notebook for experiment 3                  | done (`notebooks/experiment3_translate_test.ipynb`)                                                                                                        |
+| Logit-adjustment ablation                        | not started                                                                                                                                                |
+| SHAP (RQ2)                                       | not started                                                                                                                                                |
+| LLM baselines (config 5)                         | not started                                                                                                                                                |
+| Experiment 6 (Jev System One zero-shot)          | done — `Choice` & `Score` on `bn-test` and `en-test`, [results](results/experiment6/README.md) (`evaluate_jev.py`, `notebooks/experiment6_jev.ipynb`)      |
 
 ### Preparing English-to-Bengali translations
 
