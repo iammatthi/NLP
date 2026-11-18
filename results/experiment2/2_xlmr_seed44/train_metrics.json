@@ -1,10 +1,10 @@
 {
-  "train_runtime": 1187.554,
-  "train_samples_per_second": 23.932,
-  "train_steps_per_second": 1.499,
-  "total_flos": 1641379959591840.0,
-  "train_loss": 1.3924530350760127,
-  "epoch": 5.0,
+  "train_runtime": 2079.7914,
+  "train_samples_per_second": 13.665,
+  "train_steps_per_second": 0.856,
+  "total_flos": 3285467133889824.0,
+  "train_loss": 0.8348648489861006,
+  "epoch": 10.0,
   "label_counts": {
     "minimal": 2069,
     "mild": 232,

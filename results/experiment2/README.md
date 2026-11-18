@@ -32,39 +32,39 @@ Driver: [`notebooks/experiment2_translate_train.ipynb`](../../notebooks/experime
 
 | metric   | 2 Translate-Train   | 1 Zero-Shot (10-ep) | 4a Native XLM-R   |
 | -------- | ------------------- | ------------------- | ----------------- |
-| macro-F1 | 0.2850 +/- 0.0472   | 0.3571 +/- 0.0142   | 0.7682 +/- 0.0313 |
-| QWK      | 0.1419 +/- 0.0403   | 0.2637 +/- 0.0161   | 0.7798 +/- 0.0136 |
-| MAE      | 1.0463 +/- 0.1247   | 0.9367 +/- 0.0321   | 0.2707 +/- 0.0290 |
-| accuracy | 0.3299 +/- 0.0242   | 0.4272 +/- 0.0031   | 0.8054 +/- 0.0286 |
+| macro-F1 | 0.3147 +/- 0.0198   | 0.3571 +/- 0.0142   | 0.7981 +/- 0.0107 |
+| QWK      | 0.1262 +/- 0.0147   | 0.2637 +/- 0.0161   | 0.8167 +/- 0.0124 |
+| MAE      | 1.1109 +/- 0.0301   | 0.9367 +/- 0.0321   | 0.2327 +/- 0.0127 |
+| accuracy | 0.3265 +/- 0.0221   | 0.4272 +/- 0.0031   | 0.8272 +/- 0.0085 |
 
 | error direction                        | 2 Translate-Train   | 1 Zero-Shot (10-ep) | 4a Native XLM-R   |
 | -------------------------------------- | ------------------- | ------------------- | ----------------- |
-| upgrade rate (pred > gold)             | 0.3952 +/- 0.0672   | 0.2381 +/- 0.0165   | 0.1095 +/- 0.0125 |
-| downgrade rate (pred < gold)           | 0.2748 +/- 0.0567   | 0.3347 +/- 0.0184   | 0.0850 +/- 0.0183 |
-| error rate                             | 0.6701 +/- 0.0242   | 0.5728 +/- 0.0031   | 0.1946 +/- 0.0286 |
-| downgrade share of errors (down / err) | 0.4110 +/- 0.0908   | 0.5843 +/- 0.0301   | 0.4348 +/- 0.0368 |
+| upgrade rate (pred > gold)             | 0.4401 +/- 0.0145   | 0.2381 +/- 0.0165   | 0.1000 +/- 0.0201 |
+| downgrade rate (pred < gold)           | 0.2333 +/- 0.0205   | 0.3347 +/- 0.0184   | 0.0728 +/- 0.0136 |
+| error rate                             | 0.6735 +/- 0.0221   | 0.5728 +/- 0.0031   | 0.1728 +/- 0.0085 |
+| downgrade share of errors (down / err) | 0.3462 +/- 0.0228   | 0.5843 +/- 0.0301   | 0.4236 +/- 0.0920 |
 
 |                                 | 2 Translate-Train   | 1 Zero-Shot (10-ep) | 4a Native XLM-R   |
 | ------------------------------- | ------------------- | ------------------- | ----------------- |
-| mean signed error (pred - gold) | 0.2694 +/- 0.3111   | -0.0184 +/- 0.0827  | 0.0381 +/- 0.0139 |
+| mean signed error (pred - gold) | 0.4660 +/- 0.0301   | -0.0184 +/- 0.0827  | 0.0299 +/- 0.0325 |
 
 Per-class F1:
 
 | class    | test support | 2 Translate-Train   | 1 Zero-Shot (10-ep) | 4a Native XLM-R   |
 | -------- | ------------ | ------------------- | ------------------- | ----------------- |
-| minimal  | 210          | 0.4391 +/- 0.0953   | 0.5714 +/- 0.0222   | 0.8790 +/- 0.0169 |
-| mild     | 154          | 0.2584 +/- 0.0950   | 0.1242 +/- 0.0856   | 0.8143 +/- 0.0390 |
-| moderate | 71           | 0.2669 +/- 0.0518   | 0.3727 +/- 0.0063   | 0.5950 +/- 0.0400 |
-| severe   | 55           | 0.1754 +/- 0.1530   | 0.3603 +/- 0.0337   | 0.7845 +/- 0.0311 |
+| minimal  | 210          | 0.3852 +/- 0.0088   | 0.5714 +/- 0.0222   | 0.8965 +/- 0.0052 |
+| mild     | 154          | 0.3018 +/- 0.0673   | 0.1242 +/- 0.0856   | 0.8269 +/- 0.0144 |
+| moderate | 71           | 0.2972 +/- 0.0151   | 0.3727 +/- 0.0063   | 0.6203 +/- 0.0128 |
+| severe   | 55           | 0.2745 +/- 0.0265   | 0.3603 +/- 0.0337   | 0.8488 +/- 0.0346 |
 
 Precision / recall (mean across seeds):
 
 | class    | 2 Translate-Train P / R | 1 Zero-Shot (10-ep) P / R | 4a Native XLM-R P / R |
 | -------- | ----------------------- | ------------------------- | --------------------- |
-| minimal  | 0.4942 / 0.4063         | 0.4897 / 0.6857           | 0.8889 / 0.8698       |
-| mild     | 0.2896 / 0.2359         | 0.3488 / 0.0779           | 0.8305 / 0.8009       |
-| moderate | 0.2180 / 0.3521         | 0.3680 / 0.3803           | 0.5776 / 0.6150       |
-| severe   | 0.1295 / 0.2727         | 0.2963 / 0.4788           | 0.7538 / 0.8182       |
+| minimal  | 0.4916 / 0.3175         | 0.4897 / 0.6857           | 0.9133 / 0.8810       |
+| mild     | 0.3217 / 0.2857         | 0.3488 / 0.0779           | 0.8269 / 0.8268       |
+| moderate | 0.2523 / 0.3615         | 0.3680 / 0.3803           | 0.5950 / 0.6526       |
+| severe   | 0.2017 / 0.4303         | 0.2963 / 0.4788           | 0.8498 / 0.8485       |
 
 Class weights used by the loss (computed on the translated English train split):
 
@@ -75,53 +75,46 @@ Class weights used by the loss (computed on the translated English train split):
 | moderate | 315 (11.1%)    | 1.0246       |
 | severe   | 226 (8.0%)     | 1.4281       |
 
-Validation trajectory on translated English (`en-val` → bn, n=355) during training (seed 42; seeds 42 and 43 completed 10 epochs, seed 44 triggered early stopping at epoch 5):
+Validation checkpoint selection on the translated English validation split (n=355), from the training logs. All three seeds completed the full 10-epoch schedule; none triggered early stopping.
 
-| epoch | val macro-F1 | val loss | val MAE |
-| ----- | ------------ | -------- | ------- |
-| 1     | 0.2089       | 1.353    | 1.045   |
-| 2     | 0.2326       | 1.342    | 1.180   |
-| 3     | 0.4085       | 1.222    | 0.780   |
-| 4     | 0.4421       | 1.291    | 0.600   |
-| 5     | 0.4488       | 1.354    | 0.609   |
-| 6     | 0.4526       | 1.313    | 0.670   |
-| 7     | 0.4569       | 1.443    | 0.716   |
-| 8     | 0.4720       | 1.620    | 0.617   |
-| 9*    | 0.4816       | 1.697    | 0.580   |
-| 10*   | 0.4804       | 1.760    | 0.606   |
+| seed | best val macro-F1 | best epoch |
+| ---- | ----------------- | ---------- |
+| 42   | 0.4836            | 10         |
+| 43   | 0.5103            | 6          |
+| 44   | 0.5464            | 7          |
 
-*\*Seed 42 selected epoch 9 as the best checkpoint. Seed 44 triggered early stopping at epoch 5. Seeds 42 and 43 trained the full 10 epochs because macro-F1 improved marginally each epoch; validation loss diverged after epoch 3 in all seeds.*
+In all seeds, validation loss reached its minimum around epochs 2-4 (1.186-1.211) and then rose monotonically to 1.76-1.93 by epoch 10, while macro-F1 kept improving or held steady. Checkpoint selection therefore never coincided with the loss minimum.
 
 ## Interpretation
 
 ### Translate-train is worse than zero-shot transfer
 
-The headline finding is negative: **translating the English training data to Bengali produces a model that is worse than simply training on raw English and transferring zero-shot.** Macro-F1 drops from 0.3571 (zero-shot) to 0.2850 (translate-train), QWK from 0.2637 to 0.1419, and MAE rises from 0.9367 to 1.0463. The gap is not attributable to training schedule — both conditions use the identical 10-epoch tuned recipe.
+The headline finding is negative: **translating the English training data to Bengali produces a model that is worse than simply training on raw English and transferring zero-shot.** Macro-F1 drops from 0.3571 (zero-shot) to 0.3147 (translate-train), QWK from 0.2637 to 0.1262, and MAE rises from 0.9367 to 1.1109. The gap is not attributable to training schedule — both conditions use the identical 10-epoch tuned recipe.
 
 This result is consistent with the translation quality issues identified during spot-checking. Machine translation introduces systematic artifacts — reversed negation, literal idiom mistranslation, added content, shifted event semantics — that the model learns as if they were genuine Bengali. When evaluated on native Bengali posts that lack these artifacts, the model's learned representations are misaligned. In contrast, zero-shot transfer at least benefits from clean English source text and a shared multilingual embedding space that was not distorted by translation noise.
 
-### Error direction flips: over-estimation instead of under-estimation
+### Error direction: strong over-estimation
 
-The most striking qualitative difference from Condition 1 is the **direction of errors**. Zero-shot transfer predominantly **downgrades** severity (downgrade share of errors 0.5843), consistent with the English `minimal`-heavy prior pulling predictions toward the floor. Translate-train predominantly **upgrades** severity (upgrade rate 0.3952 vs. downgrade rate 0.2748; mean signed error +0.2694).
+Translate-train predominantly **upgrades** severity (upgrade rate 0.4401 vs. downgrade rate 0.2333; mean signed error +0.4660), the opposite of Condition 1, whose errors skew toward downgrades (downgrade share of errors 0.5843).
 
 The mean confusion matrix shows where this upward shift occurs:
 
 | predicted → | minimal | mild | moderate | severe |
 |-------------|---------|------|----------|--------|
-| **minimal** (210) | 85 | 53 | 41 | 29 |
-| **mild** (154) | 53 | 36 | 37 | 28 |
-| **moderate** (71) | 23 | 18 | 25 | 4 |
-| **severe** (55) | 10 | 13 | 17 | 15 |
+| **minimal** (210) | 67 | 59 | 40 | 45 |
+| **mild** (154) | 45 | 44 | 24 | 41 |
+| **moderate** (71) | 18 | 20 | 26 | 7 |
+| **severe** (55) | 6 | 13 | 12 | 24 |
 
-Predicted marginals: minimal 171, mild 121, moderate 120, severe 77. The model **under-predicts `minimal`** (-39 cases) and **over-predicts `moderate`** (+49 cases) and `severe` (+22 cases). This is the opposite of Condition 1, where `minimal` was over-predicted by +84 cases and `mild` collapsed by -123.
+Predicted marginals: minimal 136, mild 136, moderate 102, severe 117. The model **under-predicts `minimal`** (-74 cases) and **over-predicts `moderate`** (+31) and `severe` (+62). This is the opposite of Condition 1, where `minimal` was over-predicted by +84 cases and `mild` collapsed by -123.
 
 A plausible mechanism: translation normalises emotional intensity and collapses lexical distinctions between severity tiers. A `minimal` English post about everyday unhappiness, when translated to Bengali, may adopt vocabulary that overlaps with `moderate` or `severe` native Bengali expressions. The model learns these inflated mappings and applies them to native test posts.
 
-### Seed variability is high
+### Seed variability
 
-Test macro-F1 varies by +/- 0.0472 across seeds — substantially more than Condition 1 (+/- 0.0142) or Condition 4a (+/- 0.0313). Seed 44 is an outlier: it triggered early stopping at epoch 5 and produced `severe` F1 = 0.000 (the model never predicted `severe` on any test case), while seeds 42 and 43 reached `severe` F1 of 0.281 and 0.245.
+Test macro-F1 varies by +/- 0.0198 across seeds (0.2919 / 0.3282 / 0.3239) — comparable to Condition 1 (+/- 0.0142) and tighter than the earlier runs of this condition. All three seeds reached `severe` F1 between 0.245 and 0.297; no class collapses in any seed.
 
-The confusion matrix for seed 44 shows the collapse explicitly: the `severe` column is entirely zero across all true classes. This is consistent with early stopping preventing the model from learning the `severe` decision boundary — the class has only 226 training examples (8.0%) with weight 1.4281, and the translated examples may not carry the strong lexical cues (self-harm, suicidal ideation) that distinguish `severe` in native Bengali.
+One reproducibility caveat: the **first** seed-44 attempt destabilized — its training loss stayed at the untrained level (~1.39) for five epochs after a gradient-norm spike of ~206 early in epoch 2, its validation macro-F1 flat-lined at the uniform-random baseline, and its test predictions contained no `severe` cases at all. The run was repeated with the same seed and trained normally to 10 epochs; the artefacts above are from the successful rerun. Since seed alone does not deterministically control the outcome on this stack (bf16 plus dataloader workers), the instability is best read as run-level nondeterminism rather than a property of the configuration — but it does show this condition can fail catastrophically in individual runs.
 
 ### Class-level performance
 
@@ -129,16 +122,16 @@ All four classes perform well below Condition 4a, and the pattern differs from C
 
 | class    | 2 Translate-Train | 1 Zero-Shot (10-ep) | 4a Native |
 | -------- | ----------------- | ------------------- | --------- |
-| minimal  | 0.4391            | 0.5714              | 0.8790    |
-| mild     | 0.2584            | 0.1242              | 0.8143    |
-| moderate | 0.2669            | 0.3727              | 0.5950    |
-| severe   | 0.1754            | 0.3603              | 0.7845    |
+| minimal  | 0.3852            | 0.5714              | 0.8965    |
+| mild     | 0.3018            | 0.1242              | 0.8269    |
+| moderate | 0.2972            | 0.3727              | 0.6203    |
+| severe   | 0.2745            | 0.3603              | 0.8488    |
 
-`mild` improves relative to zero-shot (0.2584 vs. 0.1242) — translation may help the model see Bengali surface forms for the interior class. But `severe` degrades sharply (0.1754 vs. 0.3603), driven by seed 44's complete collapse. `moderate` also drops (0.2669 vs. 0.3727). The net effect is a worse overall macro-F1.
+`mild` improves relative to zero-shot (0.3018 vs. 0.1242) — translation may help the model see Bengali surface forms for the interior class. `minimal` degrades sharply (0.3852 vs. 0.5714): translated `minimal` posts lose the lexical markers that let the zero-shot model recognise the floor class, and the model pushes those cases upward instead. `severe` recall is high (0.4303) but precision is the lowest of any class (0.2017), consistent with the general upward shift.
 
 ### Training dynamics: loss–F1 divergence
 
-Validation loss diverges from macro-F1 after epoch 3 in all seeds (seed 42: loss 1.222 at epoch 3 → 1.760 at epoch 10, while macro-F1 rises 0.4085 → 0.4816). This is expected: cross-entropy penalises miscalibrated probabilities, while macro-F1 only cares about the argmax decision. The model becomes increasingly overconfident in its (often wrong) predictions, which inflates loss without changing the top-1 class. Because checkpoint selection uses macro-F1, the best model (epoch 9 for seed 42) is captured before the loss divergence becomes extreme.
+Validation loss diverges from macro-F1 after epochs 2-4 in all seeds (e.g. seed 42: loss 1.211 at epoch 4 → 1.846 at epoch 10, while macro-F1 rises 0.4179 → 0.4836). This is expected: cross-entropy penalises miscalibrated probabilities, while macro-F1 only cares about the argmax decision. The model becomes increasingly overconfident in its (often wrong) predictions, which inflates loss without changing the top-1 class. Because checkpoint selection uses macro-F1, the selected checkpoints (epochs 10, 6, 7) capture the best decision quality rather than the best-calibrated probabilities; downstream uses that consume probabilities rather than argmax decisions would need recalibration or earlier checkpoints.
 
 ## Limitations
 
@@ -146,7 +139,7 @@ Validation loss diverges from macro-F1 after epoch 3 in all seeds (seed 42: loss
 - Per-run **bootstrap 95% CIs** for macro-F1, QWK and the downgrade rate are stored inside each `eval_test.json` under `ci95`.
 - **Translation quality is not formally evaluated.** Spot-checks identified specific errors (negation reversal, idiom mistranslation, added content) but no systematic human evaluation was conducted. The extent to which translation artifacts explain the performance gap is inferred, not measured.
 - **Single translation system.** Amazon Translate is the only provider used. Other systems (IndicTrans2, Google NMT, Azure Translator) may produce different artifact profiles.
-- **Seed 44 anomaly.** Early stopping at epoch 5 and complete `severe` collapse inflates the seed spread. With 3 seeds, one outlier significantly affects the mean and std.
+- **Run-level nondeterminism.** As documented above, one run of this condition destabilized and had to be repeated. The reported aggregates come from successful runs; the failure rate of this configuration under repeated sampling is unknown.
 - **Confounded comparison with Condition 1.** The two conditions differ in training data language (translated BN vs. raw EN), which simultaneously changes the surface language, the lexical distribution, and the translation artifact profile. Separating these effects would require an ablation (e.g., training on back-translated English).
 - The test split is a single held-out set of 490 examples; per-class estimates, especially for `severe` (55 cases), have limited statistical power.
 - The source datasets state no licence. Trained weights should not be redistributed until that is settled.

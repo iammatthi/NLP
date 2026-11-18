@@ -1,10 +1,10 @@
 {
-  "train_runtime": 1114.6666,
-  "train_samples_per_second": 14.056,
-  "train_steps_per_second": 0.879,
-  "total_flos": 1784240522427792.0,
-  "train_loss": 0.6868499785053487,
-  "epoch": 4.0,
+  "train_runtime": 3792.9554,
+  "train_samples_per_second": 10.327,
+  "train_steps_per_second": 0.646,
+  "total_flos": 4481079113892264.0,
+  "train_loss": 0.5150492753787916,
+  "epoch": 10.0,
   "label_counts": {
     "minimal": 1677,
     "mild": 1232,
@@ -19,5 +19,6 @@
   },
   "model_id": "FacebookAI/xlm-roberta-base",
   "lang": "bn",
+  "splits_dir": "data/splits",
   "seed": 43
 }
