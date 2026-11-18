@@ -1,0 +1,113 @@
+{
+  "macro_f1": 0.05045871559633028,
+  "mae": 2.059183673469388,
+  "qwk": 0.0,
+  "accuracy": 0.11224489795918367,
+  "minimal": 0.0,
+  "mild": 0.0,
+  "moderate": 0.0,
+  "severe": 0.2018348623853211,
+  "direction": {
+    "n": 490,
+    "ok": 55,
+    "downgrade": 0,
+    "upgrade": 435,
+    "error_rate": 0.8877551020408163,
+    "downgrade_rate": 0.0,
+    "upgrade_rate": 0.8877551020408163,
+    "downgrade_share_of_errors": 0.0,
+    "mean_signed_error": 2.059183673469388
+  },
+  "confusion": [
+    [
+      0,
+      0,
+      0,
+      210
+    ],
+    [
+      0,
+      0,
+      0,
+      154
+    ],
+    [
+      0,
+      0,
+      0,
+      71
+    ],
+    [
+      0,
+      0,
+      0,
+      55
+    ]
+  ],
+  "classification_report": {
+    "minimal": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 210.0
+    },
+    "mild": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 154.0
+    },
+    "moderate": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 71.0
+    },
+    "severe": {
+      "precision": 0.11224489795918367,
+      "recall": 1.0,
+      "f1-score": 0.2018348623853211,
+      "support": 55.0
+    },
+    "accuracy": 0.11224489795918367,
+    "macro avg": {
+      "precision": 0.02806122448979592,
+      "recall": 0.25,
+      "f1-score": 0.05045871559633028,
+      "support": 490.0
+    },
+    "weighted avg": {
+      "precision": 0.012598917117867554,
+      "recall": 0.11224489795918367,
+      "f1-score": 0.022654933533046248,
+      "support": 490.0
+    }
+  },
+  "experiment": 5,
+  "condition": "bn",
+  "backend": "hf",
+  "model": "meta-llama/Llama-3.2-3B-Instruct",
+  "shots_per_class": 2,
+  "seed": 44,
+  "lang": "bn",
+  "split": "test",
+  "mode": "argmax",
+  "n": 490,
+  "n_total": 490,
+  "n_failed": 0,
+  "coverage": 1.0,
+  "ci95": {
+    "macro_f1": [
+      0.039473684210526314,
+      0.06093189964157706
+    ],
+    "downgrade_rate": [
+      0.0,
+      0.0
+    ],
+    "qwk": [
+      0.0,
+      0.0
+    ]
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "macro_f1": 0.06327985739750445,
+  "mae": 1.2836734693877552,
+  "qwk": 0.0,
+  "accuracy": 0.14489795918367346,
+  "minimal": 0.0,
+  "mild": 0.0,
+  "moderate": 0.2531194295900178,
+  "severe": 0.0,
+  "direction": {
+    "n": 490,
+    "ok": 71,
+    "downgrade": 55,
+    "upgrade": 364,
+    "error_rate": 0.8551020408163266,
+    "downgrade_rate": 0.11224489795918367,
+    "upgrade_rate": 0.7428571428571429,
+    "downgrade_share_of_errors": 0.13126491646778043,
+    "mean_signed_error": 1.0591836734693878
+  },
+  "confusion": [
+    [
+      0,
+      0,
+      210,
+      0
+    ],
+    [
+      0,
+      0,
+      154,
+      0
+    ],
+    [
+      0,
+      0,
+      71,
+      0
+    ],
+    [
+      0,
+      0,
+      55,
+      0
+    ]
+  ],
+  "classification_report": {
+    "minimal": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 210.0
+    },
+    "mild": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 154.0
+    },
+    "moderate": {
+      "precision": 0.14489795918367346,
+      "recall": 1.0,
+      "f1-score": 0.2531194295900178,
+      "support": 71.0
+    },
+    "severe": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 55.0
+    },
+    "accuracy": 0.14489795918367346,
+    "macro avg": {
+      "precision": 0.036224489795918365,
+      "recall": 0.25,
+      "f1-score": 0.06327985739750445,
+      "support": 490.0
+    },
+    "weighted avg": {
+      "precision": 0.020995418575593502,
+      "recall": 0.14489795918367346,
+      "f1-score": 0.03667648877732912,
+      "support": 490.0
+    }
+  },
+  "experiment": 5,
+  "condition": "bn",
+  "backend": "hf",
+  "model": "meta-llama/Llama-3.2-3B-Instruct",
+  "shots_per_class": 2,
+  "seed": 44,
+  "lang": "bn",
+  "split": "test",
+  "mode": "expected",
+  "n": 490,
+  "n_total": 490,
+  "n_failed": 0,
+  "coverage": 1.0,
+  "ci95": {
+    "macro_f1": [
+      0.05045871559633028,
+      0.07538994800693241
+    ],
+    "downgrade_rate": [
+      0.08571428571428572,
+      0.13877551020408163
+    ],
+    "qwk": [
+      0.0,
+      0.0
+    ]
+  }
+}

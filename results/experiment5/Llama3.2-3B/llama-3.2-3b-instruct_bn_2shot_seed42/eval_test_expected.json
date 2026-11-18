@@ -1,0 +1,113 @@
+{
+  "macro_f1": 0.16230375636446961,
+  "mae": 1.0163265306122449,
+  "qwk": -0.027058448708561222,
+  "accuracy": 0.23673469387755103,
+  "minimal": 0.09649122807017543,
+  "mild": 0.3744292237442922,
+  "moderate": 0.17829457364341086,
+  "severe": 0.0,
+  "direction": {
+    "n": 490,
+    "ok": 116,
+    "downgrade": 106,
+    "upgrade": 268,
+    "error_rate": 0.763265306122449,
+    "downgrade_rate": 0.2163265306122449,
+    "upgrade_rate": 0.5469387755102041,
+    "downgrade_share_of_errors": 0.28342245989304815,
+    "mean_signed_error": 0.40816326530612246
+  },
+  "confusion": [
+    [
+      11,
+      119,
+      80,
+      0
+    ],
+    [
+      3,
+      82,
+      68,
+      1
+    ],
+    [
+      2,
+      46,
+      23,
+      0
+    ],
+    [
+      2,
+      37,
+      16,
+      0
+    ]
+  ],
+  "classification_report": {
+    "minimal": {
+      "precision": 0.6111111111111112,
+      "recall": 0.05238095238095238,
+      "f1-score": 0.09649122807017543,
+      "support": 210.0
+    },
+    "mild": {
+      "precision": 0.2887323943661972,
+      "recall": 0.5324675324675324,
+      "f1-score": 0.3744292237442922,
+      "support": 154.0
+    },
+    "moderate": {
+      "precision": 0.12299465240641712,
+      "recall": 0.323943661971831,
+      "f1-score": 0.17829457364341086,
+      "support": 71.0
+    },
+    "severe": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 55.0
+    },
+    "accuracy": 0.23673469387755103,
+    "macro avg": {
+      "precision": 0.2557095394709314,
+      "recall": 0.22719803670507896,
+      "f1-score": 0.16230375636446961,
+      "support": 490.0
+    },
+    "weighted avg": {
+      "precision": 0.37047090282976186,
+      "recall": 0.23673469387755103,
+      "f1-score": 0.18486565934702048,
+      "support": 490.0
+    }
+  },
+  "experiment": 5,
+  "condition": "bn",
+  "backend": "hf",
+  "model": "meta-llama/Llama-3.2-3B-Instruct",
+  "shots_per_class": 2,
+  "seed": 42,
+  "lang": "bn",
+  "split": "test",
+  "mode": "expected",
+  "n": 490,
+  "n_total": 490,
+  "n_failed": 0,
+  "coverage": 1.0,
+  "ci95": {
+    "macro_f1": [
+      0.13586502895139002,
+      0.18957040899073532
+    ],
+    "downgrade_rate": [
+      0.1816326530612245,
+      0.25510204081632654
+    ],
+    "qwk": [
+      -0.08953172346631726,
+      0.03509226643784984
+    ]
+  }
+}

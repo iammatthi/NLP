@@ -22,7 +22,7 @@ from src.metrics import full_report
 from src.schema import load_split
 
 TRANSLATED_DIR = Path("data/translated")
-RESULTS_ROOT = Path("results/experiment5_llm")
+RESULTS_ROOT = Path("results/experiment5")
 
 
 class Scorer(Protocol):

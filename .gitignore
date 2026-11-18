@@ -12,8 +12,9 @@ data/splits/
 data/translated/*.json
 data/translated/*.jsonl
 outputs/
-results/experiment5_llm/*/raw.jsonl
-results/experiment5_llm/*_smoke/
+results/experiment5/**/raw.jsonl
+results/experiment5/**/*_smoke/
+data/translated/*_smoke.csv
 
 # notebook / editor
 .ipynb_checkpoints/

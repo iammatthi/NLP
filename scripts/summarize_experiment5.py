@@ -77,7 +77,7 @@ def build_readme(rows: list[dict]) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=Path("results/experiment5_llm"))
+    parser.add_argument("--root", type=Path, default=Path("results/experiment5"))
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
     (args.root / "README.md").write_text(build_readme(collect(args.root)), encoding="utf-8")
