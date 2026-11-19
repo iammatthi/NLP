@@ -36,15 +36,20 @@ def _render(tokenizer, messages: list[dict[str, str]]) -> str:
             messages, tokenize=False, add_generation_prompt=True
         )
     except Exception:
-        if not messages or messages[0].get("role") != "system":
-            raise
-        merged = [dict(message) for message in messages[1:]]
-        if not merged:
-            raise ValueError("chat template fallback requires a user message")
-        merged[0]["content"] = messages[0]["content"] + "\n\n" + merged[0]["content"]
-        return tokenizer.apply_chat_template(
-            merged, tokenize=False, add_generation_prompt=True
-        )
+        try:
+            merged = [dict(message) for message in messages[1:]]
+            if messages[0].get("role") != "system" or not merged:
+                raise
+            merged[0]["content"] = (
+                messages[0]["content"] + "\n\n" + merged[0]["content"]
+            )
+            return tokenizer.apply_chat_template(
+                merged, tokenize=False, add_generation_prompt=True
+            )
+        except Exception:
+            # Tokenizers without a chat template (e.g. XLM-R): plain
+            # role/content concatenation keeps the length check usable.
+            return "\n\n".join(m["content"] for m in messages)
 
 
 def prompt_lengths(
