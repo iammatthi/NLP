@@ -35,7 +35,7 @@ from src.jev_client import (
     predict_split,
 )
 from src.metrics import full_report
-from src.schema import LEVELS, LEVEL_NAMES, load_split
+from src.schema import LEVEL_NAMES, LEVELS, load_split
 
 
 @dataclass
@@ -82,7 +82,12 @@ def run_offline_checks() -> bool:
             choices={
                 "severity_choice": _MockChoiceAnswer(
                     choice="minimal",
-                    probabilities={"minimal": 0.80, "mild": 0.15, "moderate": 0.04, "severe": 0.01},
+                    probabilities={
+                        "minimal": 0.80,
+                        "mild": 0.15,
+                        "moderate": 0.04,
+                        "severe": 0.01,
+                    },
                     confidence=0.85,
                 )
             },
@@ -98,7 +103,12 @@ def run_offline_checks() -> bool:
             choices={
                 "severity_choice": _MockChoiceAnswer(
                     choice="mild",
-                    probabilities={"minimal": 0.25, "mild": 0.50, "moderate": 0.20, "severe": 0.05},
+                    probabilities={
+                        "minimal": 0.25,
+                        "mild": 0.50,
+                        "moderate": 0.20,
+                        "severe": 0.05,
+                    },
                     confidence=0.62,
                 )
             },
@@ -114,7 +124,12 @@ def run_offline_checks() -> bool:
             choices={
                 "severity_choice": _MockChoiceAnswer(
                     choice="moderate",
-                    probabilities={"minimal": 0.05, "mild": 0.20, "moderate": 0.60, "severe": 0.15},
+                    probabilities={
+                        "minimal": 0.05,
+                        "mild": 0.20,
+                        "moderate": 0.60,
+                        "severe": 0.15,
+                    },
                     confidence=0.71,
                 )
             },
@@ -130,7 +145,12 @@ def run_offline_checks() -> bool:
             choices={
                 "severity_choice": _MockChoiceAnswer(
                     choice="severe",
-                    probabilities={"minimal": 0.01, "mild": 0.04, "moderate": 0.15, "severe": 0.80},
+                    probabilities={
+                        "minimal": 0.01,
+                        "mild": 0.04,
+                        "moderate": 0.15,
+                        "severe": 0.80,
+                    },
                     confidence=0.88,
                 )
             },
@@ -149,7 +169,9 @@ def run_offline_checks() -> bool:
     y_choice = np.array([p["pred_choice"] for p in parsed], dtype=int)
     y_score = np.array([p["pred_score_round"] for p in parsed], dtype=int)
 
-    assert set(y_choice).issubset(set(LEVELS)), f"out-of-domain choice labels: {y_choice}"
+    assert set(y_choice).issubset(set(LEVELS)), (
+        f"out-of-domain choice labels: {y_choice}"
+    )
     assert set(y_score).issubset(set(LEVELS)), f"out-of-domain score labels: {y_score}"
 
     rep = full_report(y_true, y_choice)

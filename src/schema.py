@@ -36,9 +36,11 @@ def to_domain_label(index: int | np.ndarray) -> int | np.ndarray:
     """Model class 0..3 -> domain level 1..4."""
     return np.asarray(index) + 1 if isinstance(index, np.ndarray) else int(index) + 1
 
-BENGALI_PATH = Path("data/raw/depression-severity-bengali.xlsx")
-ENGLISH_PATH = Path("data/raw/depression-severity-english.csv")
-SPLITS_DIR = Path("data/splits")
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+BENGALI_PATH = REPO_ROOT / "data/raw/depression-severity-bengali.xlsx"
+ENGLISH_PATH = REPO_ROOT / "data/raw/depression-severity-english.csv"
+SPLITS_DIR = REPO_ROOT / "data/splits"
 
 TEXT_COLUMN = "text"
 LABEL_COLUMN = "label"
@@ -63,8 +65,7 @@ def load_english(path: Path | str = ENGLISH_PATH) -> pd.DataFrame:
     unmapped = sorted(set(raw) - set(NAME_TO_LEVEL))
     if unmapped:
         raise ValueError(
-            f"unmapped English label values {unmapped}; "
-            f"known: {sorted(NAME_TO_LEVEL)}"
+            f"unmapped English label values {unmapped}; known: {sorted(NAME_TO_LEVEL)}"
         )
     df[LABEL_COLUMN] = raw.map(NAME_TO_LEVEL).astype(int)
     _validate(df)

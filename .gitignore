@@ -7,6 +7,17 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 
+# tooling caches
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# builds
+dist/
+build/
+
 # generated experiment artefacts
 data/splits/
 data/translated/*.json
@@ -23,3 +34,16 @@ data/translated/*_smoke.csv
 # environment / secrets
 .env
 .env.*
+
+# LaTeX build outputs (paper/main.tex and paper/figures/*.pdf are tracked)
+# *.aux etc. and *.log are only ignored under paper/, which is where the
+# TeX sources now live (formerly repo-root main.tex).
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.out
+paper/*.synctex.gz
+paper/*.log
+paper/main.pdf

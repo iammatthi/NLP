@@ -18,7 +18,7 @@ from sklearn.metrics import (
     mean_absolute_error,
 )
 
-from src.schema import LEVELS, LEVEL_NAMES, to_domain_label
+from src.schema import LEVEL_NAMES, LEVELS, to_domain_label
 
 
 def macro_f1(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -44,9 +44,7 @@ def qwk(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     )
 
 
-def direction_matrix(
-    y_true: np.ndarray, y_pred: np.ndarray
-) -> dict[str, Any]:
+def direction_matrix(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, Any]:
     """Upgrade / ok / downgrade breakdown of errors.
 
     downgrade = pred < gold (under-estimates severity)
@@ -108,7 +106,7 @@ def full_report(
         y_true,
         y_pred,
         labels=list(LEVELS),
-        target_names=[LEVEL_NAMES[l] for l in LEVELS],
+        target_names=[LEVEL_NAMES[lvl] for lvl in LEVELS],
         zero_division=0,
         output_dict=True,
     )

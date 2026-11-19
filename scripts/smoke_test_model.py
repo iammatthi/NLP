@@ -45,7 +45,9 @@ def check_model(model_id: str, texts: list[str], num_labels: int) -> bool:
     n_params = sum(p.numel() for p in model.parameters())
     n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"  class       : {model.__class__.__name__}")
-    print(f"  tokenizer   : {tokenizer.__class__.__name__} (vocab={tokenizer.vocab_size})")
+    print(
+        f"  tokenizer   : {tokenizer.__class__.__name__} (vocab={tokenizer.vocab_size})"
+    )
     print(f"  parameters  : {n_params:,} ({n_trainable:,} trainable)")
 
     try:

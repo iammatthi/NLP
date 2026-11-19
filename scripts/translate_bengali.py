@@ -19,7 +19,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from src.schema import BENGALI_PATH, load_bengali
 
-DEFAULT_OUTPUT = Path("data/translated")
+DEFAULT_OUTPUT = _REPO_ROOT / "data/translated"
 MAX_REQUEST_BYTES = 10_000
 
 
@@ -48,7 +48,9 @@ def load_checkpoint(path: Path, frame) -> dict[int, dict]:
                     raise ValueError("empty translation")
                 records[idx] = record
             except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
-                raise ValueError(f"Invalid checkpoint at line {line_number}: {exc}") from exc
+                raise ValueError(
+                    f"Invalid checkpoint at line {line_number}: {exc}"
+                ) from exc
     return records
 
 
@@ -93,13 +95,20 @@ def main() -> None:
     frame = load_bengali(args.source)
     characters = sum(len(text) for text in frame["text"])
     too_long = [
-        idx for idx, text in enumerate(frame["text"])
+        idx
+        for idx, text in enumerate(frame["text"])
         if len(text.encode("utf-8")) > MAX_REQUEST_BYTES
     ]
     if too_long:
-        raise ValueError(f"Rows exceed Amazon Translate's 10,000-byte limit: {too_long}")
-    print(f"Rows: {len(frame)}; input characters: {characters:,}; region: {args.region}")
-    print("Standard text translation; free-tier availability depends on your AWS account.")
+        raise ValueError(
+            f"Rows exceed Amazon Translate's 10,000-byte limit: {too_long}"
+        )
+    print(
+        f"Rows: {len(frame)}; input characters: {characters:,}; region: {args.region}"
+    )
+    print(
+        "Standard text translation; free-tier availability depends on your AWS account."
+    )
     if args.dry_run:
         return
 
@@ -115,13 +124,16 @@ def main() -> None:
             f"{output} exists but its checkpoint is missing; refusing to overwrite"
         )
     client = boto3.client(
-        "translate", region_name=args.region,
+        "translate",
+        region_name=args.region,
         config=Config(retries={"mode": "standard", "max_attempts": 5}),
     )
     records = translate(frame, client, checkpoint, args.region)
     result = frame.rename(columns={"text": "source_text"}).copy()
     result.insert(0, "source_row", range(len(result)))
-    result["source_sha256"] = [records[idx]["source_sha256"] for idx in range(len(result))]
+    result["source_sha256"] = [
+        records[idx]["source_sha256"] for idx in range(len(result))
+    ]
     result["text"] = [records[idx]["text"] for idx in range(len(result))]
     temporary = output.with_suffix(".csv.tmp")
     result.to_csv(temporary, index=False)

@@ -32,7 +32,7 @@ import numpy as np
 from evaluate import bootstrap_cis
 from src.jev_client import RUBRIC_CONFIGS, predict_split
 from src.metrics import full_report
-from src.schema import LEVELS, LEVEL_NAMES, load_split
+from src.schema import LEVEL_NAMES, LEVELS, load_split
 
 
 def parse_args() -> argparse.Namespace:

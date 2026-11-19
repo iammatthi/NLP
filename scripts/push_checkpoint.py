@@ -32,10 +32,18 @@ def parse_args() -> argparse.Namespace:
         required=True,
         help="target repo, e.g. 'your-user/your-repo' (created private on first use)",
     )
-    parser.add_argument("--run-dir", type=Path, required=True, help="e.g. outputs/4a_xlmr_seed42")
-    parser.add_argument("--metrics-only", action="store_true", help="push only the small metrics files")
-    parser.add_argument("--public", action="store_true", help="make the repo public (default: private)")
-    parser.add_argument("--dry-run", action="store_true", help="list actions without contacting the Hub")
+    parser.add_argument(
+        "--run-dir", type=Path, required=True, help="e.g. outputs/4a_xlmr_seed42"
+    )
+    parser.add_argument(
+        "--metrics-only", action="store_true", help="push only the small metrics files"
+    )
+    parser.add_argument(
+        "--public", action="store_true", help="make the repo public (default: private)"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="list actions without contacting the Hub"
+    )
     return parser.parse_args()
 
 
@@ -84,8 +92,10 @@ def describe(items: list[tuple[Path, str]], metrics_only: bool) -> None:
         total += size
         kind = "dir " if local.is_dir() else "file"
         print(f"  {kind}  {human(size)}  {local}  ->  {remote}")
-    print(f"  total {human(total)}"
-          + ("  (metrics only)" if metrics_only else "  (model + metrics)"))
+    print(
+        f"  total {human(total)}"
+        + ("  (metrics only)" if metrics_only else "  (model + metrics)")
+    )
 
 
 def main() -> None:
@@ -120,7 +130,7 @@ def main() -> None:
     run_name = run_dir.name
     for local, remote in items:
         if local.is_dir():
-            commit = api.upload_folder(
+            api.upload_folder(
                 repo_id=args.repo_id,
                 folder_path=str(local),
                 path_in_repo=remote,
@@ -128,7 +138,7 @@ def main() -> None:
                 ignore_patterns=["checkpoint-*", "**/checkpoint-*"],
             )
         else:
-            commit = api.upload_file(
+            api.upload_file(
                 repo_id=args.repo_id,
                 path_or_fileobj=str(local),
                 path_in_repo=remote,
@@ -137,7 +147,9 @@ def main() -> None:
         print(f"  pushed {remote}")
 
     print(f"\ndone. repo: https://huggingface.co/{args.repo_id}")
-    print(f"  (private={not args.public} - the datasets have no licence, keep it private)")
+    print(
+        f"  (private={not args.public} - the datasets have no licence, keep it private)"
+    )
 
 
 if __name__ == "__main__":

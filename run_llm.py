@@ -19,10 +19,10 @@ import pandas as pd
 from evaluate import bootstrap_cis
 from src.llm import APIScorer, HFScorer, build_messages, few_shot_examples
 from src.metrics import full_report
-from src.schema import load_split
+from src.schema import SPLITS_DIR, load_split
 
-TRANSLATED_DIR = Path("data/translated")
-RESULTS_ROOT = Path("results/experiment5")
+TRANSLATED_DIR = _REPO_ROOT / "data/translated"
+RESULTS_ROOT = _REPO_ROOT / "results/experiment5"
 
 
 class Scorer(Protocol):
@@ -42,16 +42,28 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--bootstrap", type=int, default=1000)
     parser.add_argument("--out-root", type=Path, default=RESULTS_ROOT)
+    parser.add_argument(
+        "--splits-dir",
+        type=Path,
+        default=SPLITS_DIR,
+        help="split directory (default: data/splits under repo root)",
+    )
     return parser.parse_args()
 
 
-def load_condition(condition: str, translated_dir: Path = TRANSLATED_DIR) -> tuple[list[str], np.ndarray, pd.DataFrame]:
+def load_condition(
+    condition: str, translated_dir: Path = TRANSLATED_DIR, splits_dir: Path = SPLITS_DIR
+) -> tuple[list[str], np.ndarray, pd.DataFrame]:
     """Load texts, aligned gold labels, and train-only few-shot pool."""
     if condition == "en":
-        test = load_split("en", "test")
-        return test["text"].astype(str).tolist(), test["label"].to_numpy(dtype=int), load_split("en", "train")
+        test = load_split("en", "test", out_dir=splits_dir)
+        return (
+            test["text"].astype(str).tolist(),
+            test["label"].to_numpy(dtype=int),
+            load_split("en", "train", out_dir=splits_dir),
+        )
 
-    bengali_test = load_split("bn", "test")
+    bengali_test = load_split("bn", "test", out_dir=splits_dir)
     gold = bengali_test["label"].to_numpy(dtype=int)
     pool_file = translated_dir / "bn_pool_en.csv"
     pool = pd.read_csv(pool_file)
@@ -65,17 +77,35 @@ def load_condition(condition: str, translated_dir: Path = TRANSLATED_DIR) -> tup
     translated = pd.read_csv(translated_dir / "bn_test_en.csv")
     if len(translated) != len(bengali_test):
         raise ValueError("translated test file length differs from bn_test.csv")
-    text_aligned = translated["text_bn"].astype(str).str.strip().to_numpy() == bengali_test["text"].astype(str).str.strip().to_numpy()
+    text_aligned = (
+        translated["text_bn"].astype(str).str.strip().to_numpy()
+        == bengali_test["text"].astype(str).str.strip().to_numpy()
+    )
     labels_aligned = translated["label"].to_numpy(dtype=int) == gold
     if not bool(text_aligned.all() and labels_aligned.all()):
-        raise ValueError("translated test file is not aligned with data/splits/bn_test.csv")
-    return translated["text_en"].astype(str).tolist(), gold, pool[["text_en", "label"]].rename(columns={"text_en": "text"})
+        raise ValueError(
+            "translated test file is not aligned with data/splits/bn_test.csv"
+        )
+    return (
+        translated["text_en"].astype(str).tolist(),
+        gold,
+        pool[["text_en", "label"]].rename(columns={"text_en": "text"}),
+    )
 
 
-def write_eval(path: Path, y_true: np.ndarray, predictions: list[int | None], meta: dict[str, Any], n_boot: int, seed: int) -> dict[str, Any]:
+def write_eval(
+    path: Path,
+    y_true: np.ndarray,
+    predictions: list[int | None],
+    meta: dict[str, Any],
+    n_boot: int,
+    seed: int,
+) -> dict[str, Any]:
     answered = np.array([prediction is not None for prediction in predictions])
     observed_true = y_true[answered]
-    observed_pred = np.asarray([prediction for prediction in predictions if prediction is not None], dtype=int)
+    observed_pred = np.asarray(
+        [prediction for prediction in predictions if prediction is not None], dtype=int
+    )
     report = full_report(observed_true, observed_pred)
     report.update(meta)
     report["n"] = int(answered.sum())
@@ -108,11 +138,12 @@ def run_experiment(
     out_root: Path = RESULTS_ROOT,
     scorer: Scorer | None = None,
     translated_dir: Path = TRANSLATED_DIR,
+    splits_dir: Path = SPLITS_DIR,
     load_4bit: bool = True,
     base_url: str | None = None,
     sleep: float = 0.0,
 ) -> Path:
-    texts, gold, pool = load_condition(condition, translated_dir)
+    texts, gold, pool = load_condition(condition, translated_dir, splits_dir)
     if limit is not None:
         if limit < 0:
             raise ValueError("limit must be non-negative")
@@ -158,21 +189,53 @@ def run_experiment(
         "lang": "en" if condition == "en" else "bn",
         "split": "test",
     }
-    report = write_eval(out_dir / "eval_test.json", gold, predictions, {**meta, "mode": "argmax"}, bootstrap, seed)
+    report = write_eval(
+        out_dir / "eval_test.json",
+        gold,
+        predictions,
+        {**meta, "mode": "argmax"},
+        bootstrap,
+        seed,
+    )
     if rows and rows[0].get("probs") is not None:
-        expected = [int(np.clip(np.floor(np.dot(row["probs"], [1, 2, 3, 4]) + 0.5), 1, 4)) for row in rows]
-        write_eval(out_dir / "eval_test_expected.json", gold, expected, {**meta, "mode": "expected"}, bootstrap, seed)
+        expected = [
+            int(np.clip(np.floor(np.dot(row["probs"], [1, 2, 3, 4]) + 0.5), 1, 4))
+            for row in rows
+        ]
+        write_eval(
+            out_dir / "eval_test_expected.json",
+            gold,
+            expected,
+            {**meta, "mode": "expected"},
+            bootstrap,
+            seed,
+        )
     if report["n_failed"]:
-        strict = [prediction if prediction is not None else (4 if label <= 2 else 1) for prediction, label in zip(predictions, gold)]
-        write_eval(out_dir / "eval_test_strict.json", gold, strict, {**meta, "mode": "strict_failures_wrong"}, bootstrap, seed)
-    pd.DataFrame({
-        "i": range(len(rows)),
-        "gold": gold,
-        "pred": predictions,
-        "probs": [json.dumps(row.get("probs")) if row.get("probs") is not None else "" for row in rows],
-        "digit_mass": [row.get("digit_mass") for row in rows],
-        "raw": [row.get("raw", "") for row in rows],
-    }).to_csv(out_dir / "predictions.csv", index=False)
+        strict = [
+            prediction if prediction is not None else (4 if label <= 2 else 1)
+            for prediction, label in zip(predictions, gold)
+        ]
+        write_eval(
+            out_dir / "eval_test_strict.json",
+            gold,
+            strict,
+            {**meta, "mode": "strict_failures_wrong"},
+            bootstrap,
+            seed,
+        )
+    pd.DataFrame(
+        {
+            "i": range(len(rows)),
+            "gold": gold,
+            "pred": predictions,
+            "probs": [
+                json.dumps(row.get("probs")) if row.get("probs") is not None else ""
+                for row in rows
+            ],
+            "digit_mass": [row.get("digit_mass") for row in rows],
+            "raw": [row.get("raw", "") for row in rows],
+        }
+    ).to_csv(out_dir / "predictions.csv", index=False)
     return out_dir
 
 
@@ -187,6 +250,7 @@ def main() -> None:
         limit=args.limit,
         bootstrap=args.bootstrap,
         out_root=args.out_root,
+        splits_dir=args.splits_dir,
         load_4bit=not args.no_4bit,
         base_url=args.base_url,
         sleep=args.sleep,

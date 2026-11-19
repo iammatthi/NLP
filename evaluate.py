@@ -26,12 +26,11 @@ import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from src.metrics import (
-    direction_matrix,
     full_report,
     macro_f1,
     qwk,
 )
-from src.schema import LEVELS, LEVEL_NAMES, SPLITS_DIR, load_split, to_domain_label
+from src.schema import LEVEL_NAMES, LEVELS, SPLITS_DIR, load_split, to_domain_label
 
 
 def parse_args() -> argparse.Namespace:
@@ -39,15 +38,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-dir", type=Path, required=True)
     parser.add_argument("--lang", choices=("bn", "en"), default="bn")
     parser.add_argument("--split", choices=("test", "val"), default="test")
-    parser.add_argument("--splits-dir", type=Path, default=SPLITS_DIR,
-                        help="split directory; use data/splits/bn_to_en for experiment 3")
+    parser.add_argument(
+        "--splits-dir",
+        type=Path,
+        default=SPLITS_DIR,
+        help="split directory; use data/splits/bn_to_en for experiment 3",
+    )
     parser.add_argument("--max-length", type=int, default=256)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--bootstrap", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--out", type=Path, default=None)
-    parser.add_argument("--predictions-out", type=Path, default=None,
-                        help="optional row-aligned test predictions CSV")
+    parser.add_argument(
+        "--predictions-out",
+        type=Path,
+        default=None,
+        help="optional row-aligned test predictions CSV",
+    )
     return parser.parse_args()
 
 
@@ -112,12 +119,16 @@ def main() -> None:
     if args.predictions_out is not None:
         import pandas as pd
 
-        predictions = pd.DataFrame({
-            "split_row": np.arange(len(frame)),
-            "source_sha256": [hashlib.sha256(text.encode("utf-8")).hexdigest() for text in texts],
-            "label": y_true,
-            "prediction": y_pred,
-        })
+        predictions = pd.DataFrame(
+            {
+                "split_row": np.arange(len(frame)),
+                "source_sha256": [
+                    hashlib.sha256(text.encode("utf-8")).hexdigest() for text in texts
+                ],
+                "label": y_true,
+                "prediction": y_pred,
+            }
+        )
         args.predictions_out.parent.mkdir(parents=True, exist_ok=True)
         predictions.to_csv(args.predictions_out, index=False)
 
@@ -134,7 +145,9 @@ def main() -> None:
     out_path.write_text(json.dumps(report, indent=2))
 
     d = report["direction"]
-    print(f"\nmacro-F1 : {report['macro_f1']:.4f}  (95% CI {report['ci95']['macro_f1'][0]:.4f}-{report['ci95']['macro_f1'][1]:.4f})")
+    print(
+        f"\nmacro-F1 : {report['macro_f1']:.4f}  (95% CI {report['ci95']['macro_f1'][0]:.4f}-{report['ci95']['macro_f1'][1]:.4f})"
+    )
     print(f"QWK      : {report['qwk']:.4f}")
     print(f"MAE      : {report['mae']:.4f}")
     print(f"accuracy : {report['accuracy']:.4f}")
@@ -144,7 +157,9 @@ def main() -> None:
         print(f"  {name:9s} {report[name]:.4f}")
     print("\nerror direction:")
     print(f"  ok        {d['ok']:5d}  ({1 - d['error_rate']:.4f})")
-    print(f"  downgrade {d['downgrade']:5d}  ({d['downgrade_rate']:.4f})  <- under-estimates severity")
+    print(
+        f"  downgrade {d['downgrade']:5d}  ({d['downgrade_rate']:.4f})  <- under-estimates severity"
+    )
     print(f"  upgrade   {d['upgrade']:5d}  ({d['upgrade_rate']:.4f})")
     print(f"\nwrote {out_path}")
 

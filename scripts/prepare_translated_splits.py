@@ -43,7 +43,9 @@ def prepare(
     lang: str = "en",
 ) -> dict:
     if lang not in LOADERS:
-        raise ValueError(f"unknown language {lang!r}, expected one of {sorted(LOADERS)}")
+        raise ValueError(
+            f"unknown language {lang!r}, expected one of {sorted(LOADERS)}"
+        )
     source = LOADERS[lang](source_path)
     source.insert(0, "source_row", range(len(source)))
     translations = pd.read_csv(translations_path, keep_default_na=False)
@@ -68,18 +70,24 @@ def prepare(
     labels = pd.to_numeric(translations["label"], errors="raise")
     if labels.tolist() != source["label"].tolist():
         raise ValueError("Translation labels do not match the English source")
-    if any(not isinstance(text, str) or not text.strip() for text in translations["text"]):
+    if any(
+        not isinstance(text, str) or not text.strip() for text in translations["text"]
+    ):
         raise ValueError("Missing or empty translated text")
 
     partitions = make_splits(source, seed=seed)
     translated_parts = []
     for part in partitions:
         selected = translations.loc[part["source_row"]]
-        translated_parts.append(pd.DataFrame({
-            "text": selected["text"].tolist(),
-            "label": part["label"].tolist(),
-            "source_row": part["source_row"].tolist(),
-        }))
+        translated_parts.append(
+            pd.DataFrame(
+                {
+                    "text": selected["text"].tolist(),
+                    "label": part["label"].tolist(),
+                    "source_row": part["source_row"].tolist(),
+                }
+            )
+        )
     paths = save_splits(lang, *translated_parts, out_dir=out_dir)
     manifest = {
         "source_language": lang,
@@ -87,10 +95,17 @@ def prepare(
         "source_file_sha256": sha256(source_path.read_bytes()),
         "translation_file_sha256": sha256(translations_path.read_bytes()),
         "split_seed": seed,
-        "counts": {name: len(part) for name, part in zip(("train", "val", "test"), translated_parts)},
-        "split_file_sha256": {name: sha256(path.read_bytes()) for name, path in paths.items()},
+        "counts": {
+            name: len(part)
+            for name, part in zip(("train", "val", "test"), translated_parts)
+        },
+        "split_file_sha256": {
+            name: sha256(path.read_bytes()) for name, path in paths.items()
+        },
     }
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    (out_dir / "manifest.json").write_text(
+        json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+    )
     return manifest
 
 
@@ -103,10 +118,16 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     target = TARGETS[args.lang]
-    translations = args.translations or Path(f"data/translated/{args.lang}_to_{target}.csv")
+    translations = args.translations or (
+        _REPO_ROOT / f"data/translated/{args.lang}_to_{target}.csv"
+    )
     source = args.source or (ENGLISH_PATH if args.lang == "en" else BENGALI_PATH)
-    out_dir = args.out_dir or Path(f"data/splits/{args.lang}_to_{target}")
-    print(json.dumps(prepare(translations, source, out_dir, args.seed, args.lang), indent=2))
+    out_dir = args.out_dir or (_REPO_ROOT / f"data/splits/{args.lang}_to_{target}")
+    print(
+        json.dumps(
+            prepare(translations, source, out_dir, args.seed, args.lang), indent=2
+        )
+    )
 
 
 if __name__ == "__main__":

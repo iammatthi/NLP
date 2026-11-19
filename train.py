@@ -35,7 +35,14 @@ from transformers import (
 from src.dataset import SeverityDataset
 from src.losses import weighted_cross_entropy
 from src.metrics import compute_metrics_for_trainer
-from src.schema import LEVELS, LEVEL_NAMES, SPLITS_DIR, class_weights, load_split, to_domain_label
+from src.schema import (
+    LEVEL_NAMES,
+    LEVELS,
+    SPLITS_DIR,
+    class_weights,
+    load_split,
+    to_domain_label,
+)
 
 MODEL_CHOICES = {
     "xlmr": "FacebookAI/xlm-roberta-base",
@@ -45,7 +52,9 @@ MODEL_CHOICES = {
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", required=True, help="HF id or alias: xlmr | banglabert")
+    parser.add_argument(
+        "--model", required=True, help="HF id or alias: xlmr | banglabert"
+    )
     parser.add_argument("--lang", choices=("bn", "en"), default="bn")
     parser.add_argument("--splits-dir", type=Path, default=SPLITS_DIR)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -83,9 +92,15 @@ def main() -> None:
     labels = train_df["label"].to_numpy()
     counts = {LEVEL_NAMES[lvl]: int((labels == lvl).sum()) for lvl in LEVELS}
     weights = class_weights(labels)
-    weight_map = {LEVEL_NAMES[lvl]: round(float(w), 4) for lvl, w in zip(LEVELS, weights)}
+    weight_map = {
+        LEVEL_NAMES[lvl]: round(float(w), 4) for lvl, w in zip(LEVELS, weights)
+    }
     print(f"label counts : {counts}")
-    print(f"class weights: {weight_map}" if not args.no_class_weights else "class weights: off")
+    print(
+        f"class weights: {weight_map}"
+        if not args.no_class_weights
+        else "class weights: off"
+    )
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     model = AutoModelForSequenceClassification.from_pretrained(
@@ -99,7 +114,9 @@ def main() -> None:
 
     compute_loss_func = None
     if not args.no_class_weights:
-        compute_loss_func = weighted_cross_entropy(torch.tensor(weights, dtype=torch.float32))
+        compute_loss_func = weighted_cross_entropy(
+            torch.tensor(weights, dtype=torch.float32)
+        )
 
     use_cpu = not torch.cuda.is_available()
     if use_cpu and (args.fp16 or args.bf16):

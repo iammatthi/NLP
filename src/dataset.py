@@ -21,9 +21,7 @@ class SeverityDataset(Dataset):
     ) -> None:
         self.texts = frame[TEXT_COLUMN].tolist()
         levels = frame[LABEL_COLUMN].to_numpy().astype(int)
-        self.labels = torch.tensor(
-            to_model_label(levels), dtype=torch.long
-        )
+        self.labels = torch.tensor(to_model_label(levels), dtype=torch.long)
         self.tokenizer = tokenizer
         self.max_length = max_length
 

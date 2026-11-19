@@ -4,12 +4,20 @@ version = "0.1.0"
 description = "Natural language processing experiments"
 readme = "README.md"
 requires-python = ">=3.13"
+license = { text = "MIT" }
+authors = [
+    { name = "Matthias Berchtold" },
+    { name = "Simon Freund" },
+    { name = "Harsh Mewada" },
+]
 dependencies = [
     "accelerate>=1.1.0",
     "boto3>=1.43.121",
     "botocore[crt]>=1.43.121",
+    "huggingface-hub>=0.36.0",
     "nltk>=3.10.3",
     "numpy>=2.5.3",
+    "openai>=2.0.0",
     "openpyxl>=3.1.5",
     "pandas>=3.0.6",
     "scikit-learn>=1.9.1",
@@ -19,9 +27,46 @@ dependencies = [
     "typesafe-sdk>=0.1.0",
 ]
 
+[project.scripts]
+nlp-train = "src.cli:train"
+nlp-evaluate = "src.cli:evaluate"
+nlp-run-llm = "src.cli:run_llm"
+nlp-evaluate-jev = "src.cli:evaluate_jev"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.0",
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+extend-exclude = ["notebooks", ".venv", "outputs", "results", "data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+# E501 (line length) is left to the formatter; long rubric/prompt strings
+# in src/llm.py and src/jev_client.py are intentional.
+# E402 is ignored because repo-root entry points insert _REPO_ROOT into
+# sys.path so they run without `pip install` (e.g. Colab), which requires
+# imports to follow that shim.
+ignore = ["E501", "E402"]
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

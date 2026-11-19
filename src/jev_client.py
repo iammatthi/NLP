@@ -16,7 +16,7 @@ from typing import Any
 
 import numpy as np
 
-from src.schema import LEVELS, LEVEL_NAMES, NAME_TO_LEVEL, to_domain_label
+from src.schema import LEVEL_NAMES, LEVELS, NAME_TO_LEVEL, to_domain_label
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -132,7 +132,9 @@ def load_env_key(env_var: str = "TYPESAFE_API_KEY") -> str | None:
 def build_questions(rubric: str = "unified") -> dict[str, Any]:
     """Construct the bundled Choice + Score single-pass question payload for `rubric`."""
     if rubric not in RUBRIC_CONFIGS:
-        raise ValueError(f"Unknown rubric {rubric!r}; choices: {sorted(RUBRIC_CONFIGS)}")
+        raise ValueError(
+            f"Unknown rubric {rubric!r}; choices: {sorted(RUBRIC_CONFIGS)}"
+        )
     from typesafe_sdk import Choice, Score
 
     cfg = RUBRIC_CONFIGS[rubric]
@@ -268,7 +270,7 @@ async def _score_single_row(
                 return parse_system_one_response(resp, row_idx=row_idx)
             except Exception as exc:
                 last_err = exc
-                wait_s = min(2.0 ** attempt, 16.0)
+                wait_s = min(2.0**attempt, 16.0)
                 await asyncio.sleep(wait_s)
         raise RuntimeError(
             f"Jev API call failed for row {row_idx} after {max_retries} attempts: {last_err}"

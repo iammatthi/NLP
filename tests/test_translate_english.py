@@ -31,7 +31,12 @@ class TranslationCheckpointTests(unittest.TestCase):
             result = translate(frame, second, checkpoint, "us-east-1")
             self.assertEqual(list(result), [0, 1, 2])
             self.assertEqual([r["Text"] for r in second.calls], ["same", "other"])
-            self.assertTrue(all(set(r) == {"Text", "SourceLanguageCode", "TargetLanguageCode"} for r in second.calls))
+            self.assertTrue(
+                all(
+                    set(r) == {"Text", "SourceLanguageCode", "TargetLanguageCode"}
+                    for r in second.calls
+                )
+            )
             self.assertEqual(result[1]["label"], 2)
 
     def test_changed_source_or_region_cannot_resume(self):

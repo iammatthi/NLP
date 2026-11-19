@@ -17,7 +17,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.schema import LEVELS, LEVEL_NAMES, load, make_splits, save_splits
+from src.schema import LEVEL_NAMES, LEVELS, load, make_splits, save_splits
 
 
 def main() -> None:
@@ -37,9 +37,7 @@ def main() -> None:
     print(f"lang={args.lang}  n={len(frame)}  seed={args.seed}")
     for name, part in (("train", train), ("val", val), ("test", test)):
         counts = part["label"].value_counts().reindex(LEVELS, fill_value=0)
-        dist = ", ".join(
-            f"{LEVEL_NAMES[lvl]}={counts[lvl]}" for lvl in LEVELS
-        )
+        dist = ", ".join(f"{LEVEL_NAMES[lvl]}={counts[lvl]}" for lvl in LEVELS)
         print(f"  {name:5s} {len(part):5d}  ({dist})")
     print("written:")
     for name, path in paths.items():

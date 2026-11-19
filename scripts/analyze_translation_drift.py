@@ -15,18 +15,31 @@ if str(_REPO_ROOT) not in sys.path:
 import numpy as np
 import pandas as pd
 
-from src.schema import LEVELS, LEVEL_NAMES
+from src.schema import LEVEL_NAMES, LEVELS
 
 
 def _mcnemar(table: np.ndarray) -> dict[str, float | int]:
     discordant = int(table[0, 1] + table[1, 0])
     if discordant == 0:
-        return {"b01": int(table[0, 1]), "b10": int(table[1, 0]), "chi2": 0.0, "p_value": 1.0}
+        return {
+            "b01": int(table[0, 1]),
+            "b10": int(table[1, 0]),
+            "chi2": 0.0,
+            "p_value": 1.0,
+        }
     chi2 = (abs(int(table[0, 1] - table[1, 0])) - 1) ** 2 / discordant
     # Exact two-sided binomial test, avoiding a statsmodels dependency.
     smaller = min(int(table[0, 1]), int(table[1, 0]))
-    p_value = min(1.0, 2 * sum(math.comb(discordant, i) for i in range(smaller + 1)) / (2**discordant))
-    return {"b01": int(table[0, 1]), "b10": int(table[1, 0]), "chi2": float(chi2), "p_value": float(p_value)}
+    p_value = min(
+        1.0,
+        2 * sum(math.comb(discordant, i) for i in range(smaller + 1)) / (2**discordant),
+    )
+    return {
+        "b01": int(table[0, 1]),
+        "b10": int(table[1, 0]),
+        "chi2": float(chi2),
+        "p_value": float(p_value),
+    }
 
 
 def analyze(bn_path: Path, bn2en_path: Path) -> dict:
@@ -47,15 +60,31 @@ def analyze(bn_path: Path, bn2en_path: Path) -> dict:
     gold = native.loc[valid, "gold"].to_numpy(dtype=int)
     before = native.loc[valid, "pred"].to_numpy(dtype=int)
     after = translated.loc[valid, "pred"].to_numpy(dtype=int)
-    matrix = [[int(((before == old) & (after == new)).sum()) for new in LEVELS] for old in LEVELS]
-    correctness = np.array([[int(((before == gold) & (after == gold)).sum()), int(((before == gold) & (after != gold)).sum())], [int(((before != gold) & (after == gold)).sum()), int(((before != gold) & (after != gold)).sum())]])
+    matrix = [
+        [int(((before == old) & (after == new)).sum()) for new in LEVELS]
+        for old in LEVELS
+    ]
+    correctness = np.array(
+        [
+            [
+                int(((before == gold) & (after == gold)).sum()),
+                int(((before == gold) & (after != gold)).sum()),
+            ],
+            [
+                int(((before != gold) & (after == gold)).sum()),
+                int(((before != gold) & (after != gold)).sum()),
+            ],
+        ]
+    )
     per_class = {}
     for level in LEVELS:
         mask = gold == level
         per_class[LEVEL_NAMES[level]] = {
             "n": int(mask.sum()),
             "downgraded": int(((after < before) & mask).sum()),
-            "downgrade_rate": float(((after < before) & mask).sum() / mask.sum()) if mask.any() else 0.0,
+            "downgrade_rate": float(((after < before) & mask).sum() / mask.sum())
+            if mask.any()
+            else 0.0,
         }
     return {
         "n_paired": int(valid.sum()),

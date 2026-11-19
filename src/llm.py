@@ -29,13 +29,19 @@ def _clip(text: str, limit: int) -> str:
     return value if len(value) <= limit else value[:limit] + " ..."
 
 
-def build_messages(text: str, shots: list[tuple[str, int]] | None = None) -> list[dict[str, str]]:
+def build_messages(
+    text: str, shots: list[tuple[str, int]] | None = None
+) -> list[dict[str, str]]:
     """Build a stable system/few-shot/query chat conversation."""
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     for shot_text, level in shots or []:
-        messages.append({"role": "user", "content": f"Post:\n{_clip(shot_text, MAX_SHOT_CHARS)}"})
+        messages.append(
+            {"role": "user", "content": f"Post:\n{_clip(shot_text, MAX_SHOT_CHARS)}"}
+        )
         messages.append({"role": "assistant", "content": str(int(level))})
-    messages.append({"role": "user", "content": f"Post:\n{_clip(text, MAX_POST_CHARS)}"})
+    messages.append(
+        {"role": "user", "content": f"Post:\n{_clip(text, MAX_POST_CHARS)}"}
+    )
     return messages
 
 
@@ -51,7 +57,10 @@ def few_shot_examples(pool: pd.DataFrame, k: int, seed: int) -> list[tuple[str, 
             raise ValueError(f"pool has only {len(subset)} examples of level {level}")
         indices = rng.choice(len(subset), size=k, replace=False)
         picked = subset.iloc[indices]
-        rows.extend((str(text), int(label)) for text, label in zip(picked["text"], picked["label"]))
+        rows.extend(
+            (str(text), int(label))
+            for text, label in zip(picked["text"], picked["label"])
+        )
     order = rng.permutation(len(rows))
     return [rows[int(index)] for index in order]
 
@@ -65,7 +74,11 @@ def parse_level(text: str) -> int | None:
     digits = set(re.findall(r"(?<!\d)[1-4](?!\d)", value))
     if digits:
         return int(digits.pop()) if len(digits) == 1 else None
-    hits = {level for level, pattern in _NAME_PATTERNS.items() if re.search(rf"\b(?:{pattern})\b", value)}
+    hits = {
+        level
+        for level, pattern in _NAME_PATTERNS.items()
+        if re.search(rf"\b(?:{pattern})\b", value)
+    }
     return hits.pop() if len(hits) == 1 else None
 
 
@@ -81,7 +94,9 @@ def _token_candidates(tokenizer: Any, level: int) -> list[int]:
 class HFScorer:
     """Score using next-token probabilities from a causal language model."""
 
-    def __init__(self, model_id: str, load_4bit: bool = True, max_input_tokens: int = 2048) -> None:
+    def __init__(
+        self, model_id: str, load_4bit: bool = True, max_input_tokens: int = 2048
+    ) -> None:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
@@ -98,23 +113,29 @@ class HFScorer:
             kwargs["torch_dtype"] = torch.float16
         self.model = AutoModelForCausalLM.from_pretrained(model_id, **kwargs).eval()
         self.max_input_tokens = max_input_tokens
-        self.digit_ids = {
-            level: _token_candidates(self.tok, level) for level in LEVELS
-        }
+        self.digit_ids = {level: _token_candidates(self.tok, level) for level in LEVELS}
         if any(not ids for ids in self.digit_ids.values()):
-            raise ValueError(f"cannot map levels to single tokenizer tokens: {self.digit_ids}")
+            raise ValueError(
+                f"cannot map levels to single tokenizer tokens: {self.digit_ids}"
+            )
 
     def _render(self, messages: list[dict[str, str]]) -> str:
         try:
-            return self.tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            return self.tok.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
         except Exception:
             if not messages or messages[0].get("role") != "system":
                 raise
             merged = [dict(message) for message in messages[1:]]
             if not merged:
                 raise ValueError("chat template fallback requires a user message")
-            merged[0]["content"] = messages[0]["content"] + "\n\n" + merged[0]["content"]
-            return self.tok.apply_chat_template(merged, tokenize=False, add_generation_prompt=True)
+            merged[0]["content"] = (
+                messages[0]["content"] + "\n\n" + merged[0]["content"]
+            )
+            return self.tok.apply_chat_template(
+                merged, tokenize=False, add_generation_prompt=True
+            )
 
     def score(self, messages: list[dict[str, str]]) -> dict[str, Any]:
         torch = self._torch
@@ -146,7 +167,14 @@ class HFScorer:
 class APIScorer:
     """Score through an OpenAI-compatible endpoint."""
 
-    def __init__(self, model: str, base_url: str | None, api_key: str, max_retries: int = 5, sleep: float = 0.0) -> None:
+    def __init__(
+        self,
+        model: str,
+        base_url: str | None,
+        api_key: str,
+        max_retries: int = 5,
+        sleep: float = 0.0,
+    ) -> None:
         from openai import OpenAI
 
         self.client = OpenAI(api_key=api_key, base_url=base_url)

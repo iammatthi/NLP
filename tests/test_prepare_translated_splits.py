@@ -18,18 +18,24 @@ class PrepareTranslatedSplitsTests(unittest.TestCase):
         self.out = self.root / "splits"
         labels = ["minimum", "mild", "moderate", "severe"] * 10
         texts = ["duplicate" if idx < 2 else f"post {idx}" for idx in range(40)]
-        pd.DataFrame({"text": texts, "label": labels}).to_csv(self.source_path, index=False)
+        pd.DataFrame({"text": texts, "label": labels}).to_csv(
+            self.source_path, index=False
+        )
         source = load_english(self.source_path)
-        self.translations = pd.DataFrame({
-            "source_row": range(len(source)),
-            "source_text": source["text"],
-            "source_sha256": [sha256(t.encode("utf-8")) for t in source["text"]],
-            "text": [f"translation {idx}" for idx in range(len(source))],
-            "label": source["label"],
-        })
+        self.translations = pd.DataFrame(
+            {
+                "source_row": range(len(source)),
+                "source_text": source["text"],
+                "source_sha256": [sha256(t.encode("utf-8")) for t in source["text"]],
+                "text": [f"translation {idx}" for idx in range(len(source))],
+                "label": source["label"],
+            }
+        )
 
     def test_translated_splits_match_original_rows_and_labels(self):
-        self.translations.sample(frac=1, random_state=7).to_csv(self.translations_path, index=False)
+        self.translations.sample(frac=1, random_state=7).to_csv(
+            self.translations_path, index=False
+        )
         manifest = prepare(self.translations_path, self.source_path, self.out, seed=42)
         source = load_english(self.source_path)
         source.insert(0, "source_row", range(len(source)))
@@ -37,7 +43,10 @@ class PrepareTranslatedSplitsTests(unittest.TestCase):
             actual = pd.read_csv(self.out / f"en_{name}.csv")
             self.assertEqual(actual["source_row"].tolist(), part["source_row"].tolist())
             self.assertEqual(actual["label"].tolist(), part["label"].tolist())
-            self.assertEqual(actual["text"].tolist(), [f"translation {i}" for i in part["source_row"]])
+            self.assertEqual(
+                actual["text"].tolist(),
+                [f"translation {i}" for i in part["source_row"]],
+            )
             self.assertEqual(manifest["counts"][name], len(part))
 
     def test_invalid_source_or_missing_translation_is_rejected(self):
@@ -62,20 +71,28 @@ class PrepareTranslatedSplitsTests(unittest.TestCase):
 
     def test_bengali_source_builds_translated_english_splits(self):
         source_path = self.root / "source.xlsx"
-        pd.DataFrame({
-            "posts": [f"post {idx}" for idx in range(40)],
-            "labels": [1, 2, 3, 4] * 10,
-        }).to_excel(source_path, index=False)
+        pd.DataFrame(
+            {
+                "posts": [f"post {idx}" for idx in range(40)],
+                "labels": [1, 2, 3, 4] * 10,
+            }
+        ).to_excel(source_path, index=False)
         source = load_bengali(source_path)
-        translations = pd.DataFrame({
-            "source_row": range(len(source)),
-            "source_text": source["text"],
-            "source_sha256": [sha256(t.encode("utf-8")) for t in source["text"]],
-            "text": [f"translation {idx}" for idx in range(len(source))],
-            "label": source["label"],
-        })
-        translations.sample(frac=1, random_state=7).to_csv(self.translations_path, index=False)
-        manifest = prepare(self.translations_path, source_path, self.out, seed=42, lang="bn")
+        translations = pd.DataFrame(
+            {
+                "source_row": range(len(source)),
+                "source_text": source["text"],
+                "source_sha256": [sha256(t.encode("utf-8")) for t in source["text"]],
+                "text": [f"translation {idx}" for idx in range(len(source))],
+                "label": source["label"],
+            }
+        )
+        translations.sample(frac=1, random_state=7).to_csv(
+            self.translations_path, index=False
+        )
+        manifest = prepare(
+            self.translations_path, source_path, self.out, seed=42, lang="bn"
+        )
         self.assertEqual(manifest["source_language"], "bn")
         self.assertEqual(manifest["target_language"], "en")
         source.insert(0, "source_row", range(len(source)))
@@ -83,7 +100,10 @@ class PrepareTranslatedSplitsTests(unittest.TestCase):
             actual = pd.read_csv(self.out / f"bn_{name}.csv")
             self.assertEqual(actual["source_row"].tolist(), part["source_row"].tolist())
             self.assertEqual(actual["label"].tolist(), part["label"].tolist())
-            self.assertEqual(actual["text"].tolist(), [f"translation {i}" for i in part["source_row"]])
+            self.assertEqual(
+                actual["text"].tolist(),
+                [f"translation {i}" for i in part["source_row"]],
+            )
             self.assertEqual(manifest["counts"][name], len(part))
 
 
