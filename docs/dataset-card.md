@@ -14,15 +14,23 @@ uv run python scripts/verify_data.py
 bash scripts/reproduce.sh   # regenerates derived files below
 ```
 
-## Derived artefacts (regenerated, gitignored)
+## Derived artefacts
+
+### Tracked (checksummed, not regenerated)
+
+- **Translation alignments** (`data/translated/en_to_bn.csv`,
+  `bn_to_en.csv`, plus experiment-5 `bn_test_en.csv` / `bn_pool_en.csv`):
+  Amazon Translate `TranslateText`, per-row sha256 + label kept beside the
+  translation. These are tracked in git and pinned by `data/checksums.txt`.
+  (`*.json` metadata and `*.checkpoint.jsonl` are gitignored, regenerate
+  on demand and are not checked.)
+
+### Regenerated (gitignored)
 
 - **Splits** (`data/splits/{bn,en}_{train,val,test}.csv`): stratified
   80/10/10, seed 42, produced by `scripts/prepare_splits.py`. Byte-reproducible
   from the sources + seed; the seed is the single source of truth.
-- **Translation alignments** (`data/translated/en_to_bn.csv`,
-  `bn_to_en.csv`, plus experiment-5 `bn_test_en.csv` / `bn_pool_en.csv`):
-  Amazon Translate `TranslateText`, per-row sha256 + label kept beside the
-  translation; `scripts/prepare_translated_splits.py` validates the join
+  `scripts/prepare_translated_splits.py` validates the translation join
   and writes `data/splits/{en_to_bn,bn_to_en}/manifest.json` with split-file
   hashes, seeds, and counts.
 
