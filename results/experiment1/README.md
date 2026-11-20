@@ -10,14 +10,14 @@ Fine-tune on **English** data (`en-train`, validated on `en-val`) and evaluate z
 | parameters | ~278M                                        | ~278M                                         |
 
 Setup: 3 seeds (42/43/44), class-weighted cross-entropy (computed from `en-train`), max length 256, lr 2e-5, batch 16, weight decay 0.01. Best checkpoint selected on **English validation macro-F1**, then scored once zero-shot on the held-out **Bengali test** split (n=490). We report two training schedules for Condition 1:
-- **1 (4-ep default):** 4 epochs, warmup 0, early-stopping patience 3 — matching the exact training schedule of Condition 4a for a strictly controlled comparison.
-- **1 (10-ep tuned):** up to 10 epochs, warmup 100 steps, early-stopping patience 4 — selected on `en-val` to address minority-class under-convergence on the heavily imbalanced English split. The committed `1_xlmr_seed{N}/` artefacts correspond to this tuned 10-epoch run.
+- **1 (4-ep default):** 4 epochs, warmup 0, early-stopping patience 3 (committed in `1_xlmr_seed{N}/`).
+- **1 (10-ep tuned):** up to 10 epochs, warmup 100 steps, early-stopping patience 4 — selected on `en-val` to address minority-class under-convergence on the heavily imbalanced English split (committed in `1_xlmr_tuned_seed{N}/`). Condition 4a (from Experiment 4) uses the matching 10-epoch schedule (`up to 10 epochs, warmup 100, patience 4`) on native Bengali.
 
 All numbers below are mean +/- std across the 3 seeds.
 
 ## Artefacts
 
-Each `1_xlmr_seed{N}/` directory holds the two artefacts written by `train.py` and `evaluate.py`:
+Each `1_xlmr_seed{N}/` (4-epoch default) and `1_xlmr_tuned_seed{N}/` (10-epoch tuned) directory holds the two artefacts written by `train.py` and `evaluate.py`:
 
 - `eval_test.json` — full ordinal metric suite on `bn-test`: macro-F1, per-class F1, MAE, QWK, accuracy, the upgrade/ok/downgrade direction matrix, the confusion matrix, the classification report, and bootstrap 95% CIs for macro-F1, QWK and the downgrade rate.
 - `train_metrics.json` — English training summary: final train loss, runtime, English train label counts and the inverse-frequency class weights.
